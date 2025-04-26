@@ -1,33 +1,35 @@
 import ComposableArchitecture
+import Foundation
 
-public struct Menu: Reducer {
+public struct GlassBoard: Reducer {
     
-    public struct State: Equatable {
+    public struct State: Equatable, Identifiable {
         
-        public init() {}
+        public let id: UUID
+        public let frame: NSRect
+        
+        public init(id: UUID, frame: NSRect) {
+            self.id = id
+            self.frame = frame
+        }
     }
     
     public enum Action {
-        
-        case start
         
         case delegate(DelegateAction)
         
         public enum DelegateAction: Equatable {
             
-            case selectPen
+            case dismiss
         }
     }
     
-    public init() {}
+    public init() {
+    }
     
     public var body: some Reducer<State, Action> {
         Reduce { state, action in
             switch action {
-            case .start:
-                return .run { send in
-                }
-                
             case .delegate:
                 return .none
             }

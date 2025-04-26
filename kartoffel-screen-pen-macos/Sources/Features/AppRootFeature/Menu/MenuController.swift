@@ -25,6 +25,22 @@ public class MenuController: NSObject {
     public func load() {
         let mainMenu = NSMenu()
         mainMenu.delegate = self
+
+        let pen = NSMenuItem(
+            title: "Pen",
+            action: #selector(handlePenClick),
+            keyEquivalent: ""
+        )
+        pen.target = self
+        mainMenu.addItem(pen)
+
+        let clear = NSMenuItem(
+            title: "Erase All",
+            action: #selector(handleClearClick),
+            keyEquivalent: ""
+        )
+        clear.target = self
+        mainMenu.addItem(clear)
         
         mainMenu.addItem(NSMenuItem.separator())
         
@@ -33,7 +49,6 @@ public class MenuController: NSObject {
             action: #selector(NSApp.terminate(_:)),
             keyEquivalent: ""
         )
-        
         mainMenu.addItem(quit)
 
         statusBarItem.menu = mainMenu
@@ -44,6 +59,14 @@ public class MenuController: NSObject {
     }
     
     private func setupBindings() {
+    }
+
+    @objc private func handlePenClick(_ sender: NSMenuItem) {
+        viewStore.send(.delegate(.selectPen))
+    }
+    
+    @objc private func handleClearClick(_ sender: NSMenuItem) {
+
     }
 }
 

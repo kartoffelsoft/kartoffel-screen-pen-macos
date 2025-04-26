@@ -18,11 +18,25 @@ let package = Package(
     ],
     targets: [
         .target(
+            name: "Common",
+            path: "./Sources/Common"
+        ),
+        
+        .target(
             name: "AppRootFeature",
             dependencies: [
+                "Common",
+                "GlassBoardFeature",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
             ],
             path: "./Sources/Features/AppRootFeature"
+        ),
+        .target(
+            name: "GlassBoardFeature",
+            dependencies: [
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+            ],
+            path: "./Sources/Features/GlassBoardFeature"
         ),
     ]
 )
