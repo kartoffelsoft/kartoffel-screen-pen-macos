@@ -26,10 +26,12 @@ class GlassBoardView: MTKView {
         self.wantsLayer = true;
         self.layer?.backgroundColor = .clear
     }
-
-    override func keyUp(with event: NSEvent) {
-        print("# GlassBoardView:keyUp")
-        uiDelegate?.didKeyUp()
+    
+    override func performKeyEquivalent(with event: NSEvent) -> Bool {
+        if event.keyCode == 53 && event.type == .keyDown {
+            uiDelegate?.didKeyUp()
+        }
+        return true
     }
     
     override func viewDidMoveToWindow() {

@@ -31,10 +31,6 @@ public class GlassBoardViewController: NSViewController {
         self.view.window?.setFrame(viewStore.frame, display: true)
     }
     
-    public override func viewDidAppear() {
-        super.viewDidAppear()
-    }
-    
     public override var representedObject: Any? {
         didSet {
         }
@@ -44,19 +40,6 @@ public class GlassBoardViewController: NSViewController {
         let view = GlassBoardView(frame: .zero, device: MTLCreateSystemDefaultDevice())
         view.uiDelegate = self
         self.view = view
-    }
-    
-//    public override func performKeyEquivalent(with event: NSEvent) -> Bool {
-//        print("# performKeyEquivalent");
-//        viewStore.send(.delegate(.dismiss))
-//        
-//        return true
-//    }
-    
-    public override func keyUp(with event: NSEvent) {
-        print("# keyUp");
-        super.keyUp(with: event)
-        viewStore.send(.delegate(.dismiss))
     }
 
     private func setupConstraints() {
