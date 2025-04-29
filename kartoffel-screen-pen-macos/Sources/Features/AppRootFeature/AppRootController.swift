@@ -36,23 +36,21 @@ public class AppRootController {
                 return
             }
             
+            print("data count: ", data.count)
             data.forEach { id in
-                self.store
-                    .scope(state: { $0.glassBoards[id: id] }, action: { .glassBoards(id: id, action: $0) })
-                    .ifLet(
-                        then: { [weak self] childStore in
-                            let controller = GlassBoardWindowController(
-                                id: id,
-                                store: childStore
-                            )
-                            controller.showWindow(self)
-                            self?.glassBoardWindowControllers.append(controller)
-                        },
-                        else: {
-                            
-                        }
-                    )
-                    .store(in: &self.cancellables)
+                let controller = GlassBoardWindowController(id: id)
+                
+                controller.contentViewController = IfLetStoreController(store: self.store.scope(
+                    state: { $0.glassBoards[id: id] },
+                    action: { .glassBoards(id: id, action: $0) }
+                )) {
+                    GlassBoardViewController(store: $0)
+                } else: {
+                    NSViewController()
+                }
+                
+                controller.showWindow(self)
+                self.glassBoardWindowControllers.append(controller)
             }
         }
         .store(in: &self.cancellables)

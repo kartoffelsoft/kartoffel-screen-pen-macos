@@ -18,8 +18,6 @@ public class GlassBoardWindow: NSWindow {
         self.backgroundColor = .clear
         self.ignoresMouseEvents = false
     }
-
-    public override var canBecomeKey: Bool {
-        return true
-    }
+    
+    public override var canBecomeKey: Bool { true }
 }

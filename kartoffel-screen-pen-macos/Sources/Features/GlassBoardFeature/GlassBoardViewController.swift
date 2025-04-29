@@ -21,14 +21,18 @@ public class GlassBoardViewController: NSViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
 
+        
         setupConstraints()
         setupBindings()
     }
 
+    public override func viewWillAppear() {
+        super.viewWillAppear()
+        self.view.window?.setFrame(viewStore.frame, display: true)
+    }
+    
     public override func viewDidAppear() {
         super.viewDidAppear()
-        view.window?.delegate = self
-        view.window?.makeFirstResponder(self);
     }
     
     public override var representedObject: Any? {
@@ -37,16 +41,24 @@ public class GlassBoardViewController: NSViewController {
     }
     
     public override func loadView() {
-        view = NSView(frame: .zero)
-        view.wantsLayer = true;
-        view.layer?.backgroundColor = .clear
+        let view = GlassBoardView(frame: .zero, device: MTLCreateSystemDefaultDevice())
+        view.uiDelegate = self
+        self.view = view
     }
     
+//    public override func performKeyEquivalent(with event: NSEvent) -> Bool {
+//        print("# performKeyEquivalent");
+//        viewStore.send(.delegate(.dismiss))
+//        
+//        return true
+//    }
+    
     public override func keyUp(with event: NSEvent) {
+        print("# keyUp");
         super.keyUp(with: event)
         viewStore.send(.delegate(.dismiss))
     }
-    
+
     private func setupConstraints() {
     }
     
@@ -54,9 +66,9 @@ public class GlassBoardViewController: NSViewController {
     }
 }
 
-extension GlassBoardViewController: NSWindowDelegate {
+extension GlassBoardViewController: GlassBoardViewDelegate {
     
-    public func windowWillClose(_ notification: Notification) {
+    func didKeyUp() {
         viewStore.send(.delegate(.dismiss))
     }
 }
