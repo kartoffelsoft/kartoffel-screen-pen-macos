@@ -91,8 +91,8 @@ public class AppRootController {
 
                     if self.cursor == nil {
                         let image = NSImage.theme.laserPointerCursor
-                        image.size = NSSize(width: 16, height: 16)
-                        self.cursor = NSCursor(image: image, hotSpot: NSPoint(x: 8, y: 8))
+                        image.size = NSSize(width: 20, height: 20)
+                        self.cursor = NSCursor(image: image, hotSpot: NSPoint(x: 10, y: 10))
                     }
                     self.cursor?.set()
                 }

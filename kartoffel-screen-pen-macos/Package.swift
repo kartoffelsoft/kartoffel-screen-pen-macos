@@ -48,6 +48,20 @@ let package = Package(
         ),
         
         .target(
+            name: "Renderer",
+            dependencies: [
+            ],
+            path: "./Sources/Services/Renderer",
+            publicHeadersPath: "Public",
+            cxxSettings: [
+                .unsafeFlags(["-std=c++20"]),
+                .unsafeFlags([
+                    "-I../deps/metal-cpp"
+                ])
+            ],
+        ),
+        
+        .target(
             name: "StyleGuide",
             resources: [.process("Resources")]
         ),
