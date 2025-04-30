@@ -18,15 +18,23 @@ let package = Package(
     ],
     targets: [
         .target(
+            name: "AppKitUtils",
+            dependencies: [
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+            ]
+        ),
+        
+        .target(
             name: "Common",
-            path: "./Sources/Common"
         ),
         
         .target(
             name: "AppRootFeature",
             dependencies: [
+                "AppKitUtils",
                 "Common",
                 "GlassBoardFeature",
+                "StyleGuide",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
             ],
             path: "./Sources/Features/AppRootFeature"
@@ -37,6 +45,11 @@ let package = Package(
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
             ],
             path: "./Sources/Features/GlassBoardFeature"
+        ),
+        
+        .target(
+            name: "StyleGuide",
+            resources: [.process("Resources")]
         ),
     ]
 )

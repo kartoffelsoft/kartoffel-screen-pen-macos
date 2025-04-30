@@ -1,7 +1,9 @@
 import AppKit
+import AppKitUtils
 import Combine
 import ComposableArchitecture
 import GlassBoardFeature
+import StyleGuide
 
 @MainActor
 public class AppRootController {
@@ -86,11 +88,11 @@ public class AppRootController {
             case .laserPointer:
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
                     guard let self = self else { return }
-                    
+
                     if self.cursor == nil {
-                        if let image = NSImage(named: "LaserPointerCursor") {
-                            self.cursor = NSCursor(image: image, hotSpot: NSPoint(x: 16, y: 16))
-                        }
+                        let image = NSImage.theme.laserPointerCursor
+                        image.size = NSSize(width: 16, height: 16)
+                        self.cursor = NSCursor(image: image, hotSpot: NSPoint(x: 8, y: 8))
                     }
                     self.cursor?.set()
                 }
