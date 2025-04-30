@@ -59,6 +59,11 @@ public struct AppRoot: Reducer {
                 state.createGlassBoards.fire()
                 return .none
                 
+            case .menu(.delegate(.selectLaserPointer)):
+                state.stationery = .laserPointer
+                state.createGlassBoards.fire()
+                return .none
+                
             case .menu:
                 return .none
             }

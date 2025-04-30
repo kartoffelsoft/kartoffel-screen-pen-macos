@@ -34,6 +34,14 @@ public class MenuController: NSObject {
         pen.target = self
         mainMenu.addItem(pen)
 
+        let laserPointer = NSMenuItem(
+            title: "Laser Pointer",
+            action: #selector(handleLaserPointerClick),
+            keyEquivalent: ""
+        )
+        laserPointer.target = self
+        mainMenu.addItem(laserPointer)
+        
         let clear = NSMenuItem(
             title: "Erase All",
             action: #selector(handleClearClick),
@@ -63,6 +71,10 @@ public class MenuController: NSObject {
 
     @objc private func handlePenClick(_ sender: NSMenuItem) {
         viewStore.send(.delegate(.selectPen))
+    }
+    
+    @objc private func handleLaserPointerClick(_ sender: NSMenuItem) {
+        viewStore.send(.delegate(.selectLaserPointer))
     }
     
     @objc private func handleClearClick(_ sender: NSMenuItem) {

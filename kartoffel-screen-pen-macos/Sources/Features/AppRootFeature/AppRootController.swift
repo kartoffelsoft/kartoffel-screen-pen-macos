@@ -81,15 +81,28 @@ public class AppRootController {
                     }
                     self.cursor?.set()
                 }
-                break;
+                break
+                
+            case .laserPointer:
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+                    guard let self = self else { return }
+                    
+                    if self.cursor == nil {
+                        if let image = NSImage(named: "LaserPointerCursor") {
+                            self.cursor = NSCursor(image: image, hotSpot: NSPoint(x: 16, y: 16))
+                        }
+                    }
+                    self.cursor?.set()
+                }
+                break
                 
             case .eraser:
-                break;
+                break
                 
             case .none:
                 cursor = nil
                 NSCursor.arrow.set()
-                break;
+                break
             }
         }
         .store(in: &self.cancellables)

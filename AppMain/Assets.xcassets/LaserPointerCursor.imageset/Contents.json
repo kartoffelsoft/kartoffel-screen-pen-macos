@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "smallcircle.filled.circle.svg",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

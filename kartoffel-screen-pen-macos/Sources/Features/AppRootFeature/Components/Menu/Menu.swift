@@ -16,6 +16,7 @@ public struct Menu: Reducer {
         public enum DelegateAction: Equatable {
             
             case selectPen
+            case selectLaserPointer
         }
     }
     
