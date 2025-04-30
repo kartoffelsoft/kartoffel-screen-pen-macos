@@ -1,4 +1,4 @@
-import Cocoa
+import AppKit
 import Combine
 import ComposableArchitecture
 import GlassBoardFeature
@@ -12,6 +12,8 @@ public class AppRootController {
     
     private var glassBoardWindowControllers: IdentifiedArrayOf<GlassBoardWindowController> = []
     private let menuController: MenuController
+
+    private var cursor: NSCursor?
 
     public init(store: StoreOf<AppRoot>) {
         self.store = store
@@ -28,6 +30,13 @@ public class AppRootController {
     }
     
     private func setupBindings() {
+        viewStore.publisher.createGlassBoards.sink { [weak self] data in
+            guard data.isValid else { return }
+            guard let self = self else { return }
+            self.viewStore.send(.createGlassBoards(NSScreen.screens.map{$0.frame}))
+        }
+        .store(in: &self.cancellables)
+        
         viewStore.publisher.showGlassBoards.sink { [weak self] data in
             guard let self = self else { return }
             guard data.count > 0 else {
@@ -36,7 +45,8 @@ public class AppRootController {
                 return
             }
             
-            print("data count: ", data.count)
+            NSApp.activate(ignoringOtherApps: true)
+
             data.forEach { id in
                 let controller = GlassBoardWindowController(id: id)
                 
@@ -55,10 +65,32 @@ public class AppRootController {
         }
         .store(in: &self.cancellables)
         
-        viewStore.publisher.createGlassBoards.sink { [weak self] data in
-            guard data.isValid else { return }
+        viewStore.publisher.stationery.sink { [weak self] data in
             guard let self = self else { return }
-            self.viewStore.send(.createGlassBoards(NSScreen.screens.map{$0.frame}))
+            
+            switch(data) {
+            case let .pen(color: color):
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+                    guard let self = self else { return }
+                    
+                    if self.cursor == nil {
+                        if let image = NSImage(systemSymbolName: "hand.point.up.left.fill", accessibilityDescription: nil) {
+                            image.size = NSSize(width: 32, height: 32)
+                            self.cursor = NSCursor(image: image, hotSpot: NSPoint(x: 16, y: 16))
+                        }
+                    }
+                    self.cursor?.set()
+                }
+                break;
+                
+            case .eraser:
+                break;
+                
+            case .none:
+                cursor = nil
+                NSCursor.arrow.set()
+                break;
+            }
         }
         .store(in: &self.cancellables)
     }

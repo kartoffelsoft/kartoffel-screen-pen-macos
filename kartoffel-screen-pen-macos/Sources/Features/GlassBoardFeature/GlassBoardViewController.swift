@@ -8,6 +8,8 @@ public class GlassBoardViewController: NSViewController {
     private let viewStore: ViewStoreOf<GlassBoard>
     private var cancellables: Set<AnyCancellable> = []
     
+    private var cursor: NSCursor?
+    
     public init(store: StoreOf<GlassBoard>) {
         self.store = store
         self.viewStore = ViewStore(store, observe: { $0 })
@@ -21,7 +23,6 @@ public class GlassBoardViewController: NSViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
 
-        
         setupConstraints()
         setupBindings()
     }
@@ -29,6 +30,11 @@ public class GlassBoardViewController: NSViewController {
     public override func viewWillAppear() {
         super.viewWillAppear()
         self.view.window?.setFrame(viewStore.frame, display: true)
+    }
+    
+    public override func viewDidAppear() {
+        super.viewDidAppear()
+        self.view.window?.makeKeyAndOrderFront(nil)
     }
     
     public override var representedObject: Any? {

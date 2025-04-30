@@ -12,6 +12,7 @@ public struct AppRoot: Reducer {
         var glassBoards: IdentifiedArrayOf<GlassBoard.State> = []
         var menu: Menu.State = .init()
         var showGlassBoards: [UUID] = []
+        var stationery: Stationery = .none
         
         public init() {}
     }
@@ -31,7 +32,6 @@ public struct AppRoot: Reducer {
         Reduce { state, action in
             switch action {
             case let .createGlassBoards(screenFrames):
-                print("createGlassBoards")
                 for frame in screenFrames {
                     let id = UUID()
                     state.glassBoards.append(.init(id: id, frame: frame))
@@ -48,12 +48,14 @@ public struct AppRoot: Reducer {
             case let .glassBoards(id: id, action: .delegate(.dismiss)):
                 state.glassBoards.removeAll()
                 state.showGlassBoards.removeAll()
+                state.stationery = .none
                 return .none
                 
             case .glassBoards:
                 return .none
-                
+
             case .menu(.delegate(.selectPen)):
+                state.stationery = .pen(color: .white)
                 state.createGlassBoards.fire()
                 return .none
                 

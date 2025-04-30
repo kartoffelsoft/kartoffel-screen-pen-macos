@@ -22,14 +22,12 @@ class GlassBoardView: MTKView {
         self.colorPixelFormat = .bgra8Unorm
         self.clearColor = MTLClearColorMake(0.0, 0.0, 0.0, 0.0)
         self.delegate = self
-        
-        self.wantsLayer = true;
-        self.layer?.backgroundColor = .clear
     }
     
     override func performKeyEquivalent(with event: NSEvent) -> Bool {
         if event.keyCode == 53 && event.type == .keyDown {
             uiDelegate?.didKeyUp()
+            return true
         }
         return true
     }
