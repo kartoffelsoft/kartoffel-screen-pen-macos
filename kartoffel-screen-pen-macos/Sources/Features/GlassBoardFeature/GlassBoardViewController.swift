@@ -2,17 +2,21 @@ import Cocoa
 import Combine
 import ComposableArchitecture
 
+import MTLRenderer
+
 public class GlassBoardViewController: NSViewController {
 
     private let store: StoreOf<GlassBoard>
     private let viewStore: ViewStoreOf<GlassBoard>
     private var cancellables: Set<AnyCancellable> = []
     
+    private let renderer: MTLRenderer
     private var cursor: NSCursor?
     
     public init(store: StoreOf<GlassBoard>) {
         self.store = store
         self.viewStore = ViewStore(store, observe: { $0 })
+        self.renderer = .init(device: MTLCreateSystemDefaultDevice())
         super.init(nibName: nil, bundle: nil)
     }
 
