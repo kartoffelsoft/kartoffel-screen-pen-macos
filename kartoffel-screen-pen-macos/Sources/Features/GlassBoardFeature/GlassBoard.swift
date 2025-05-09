@@ -8,7 +8,8 @@ public struct GlassBoard: Reducer {
         
         public let id: UUID
         public let frame: NSRect
-        public let drawingData: [DrawingData] = []
+        public var currentDrawingTool: DrawingTool = .pen(color: .blue)
+        public var drawings: [DrawingData] = []
         
         public init(id: UUID, frame: NSRect) {
             self.id = id
@@ -17,6 +18,10 @@ public struct GlassBoard: Reducer {
     }
     
     public enum Action {
+        
+        case startDrawing(CGPoint)
+        case continueDrawing(CGPoint)
+        case endDrawing(CGPoint)
         
         case delegate(DelegateAction)
         
@@ -32,6 +37,23 @@ public struct GlassBoard: Reducer {
     public var body: some Reducer<State, Action> {
         Reduce { state, action in
             switch action {
+            case let .startDrawing(point):
+                state.drawings.append(.init())
+
+                guard let lastIndex = state.drawings.indices.last else { return .none}
+                state.drawings[lastIndex].add(point: point)
+                return .none
+                
+            case let .continueDrawing(point):
+                guard let lastIndex = state.drawings.indices.last else { return .none}
+                state.drawings[lastIndex].add(point: point)
+                return .none
+            
+            case let .endDrawing(point):
+                guard let lastIndex = state.drawings.indices.last else { return .none}
+                state.drawings[lastIndex].add(point: point)
+                return .none
+            
             case .delegate:
                 return .none
             }

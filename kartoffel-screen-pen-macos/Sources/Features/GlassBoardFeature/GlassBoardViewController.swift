@@ -67,21 +67,36 @@ public class GlassBoardViewController: NSViewController {
     }
     
     public override func mouseDown(with event: NSEvent) {
-        print("# mouseDown")
+        viewStore.send(.startDrawing(.init(
+            x: event.locationInWindow.x,
+            y: self.view.frame.size.height - event.locationInWindow.y
+        )))
     }
     
     public override func mouseUp(with event: NSEvent) {
-        print("# mouseUp")
+        viewStore.send(.endDrawing(.init(
+            x: event.locationInWindow.x,
+            y: self.view.frame.size.height - event.locationInWindow.y
+        )))
     }
 
     public override func mouseDragged(with event: NSEvent) {
-        print("# mouseDragged")
+        viewStore.send(.continueDrawing(.init(
+            x: event.locationInWindow.x,
+            y: self.view.frame.size.height - event.locationInWindow.y
+        )))
     }
     
     private func setupConstraints() {
     }
     
     private func setupBindings() {
+        viewStore.publisher.drawings.sink { [weak self] data in
+            guard let self = self else { return }
+            
+            self.mtkView.needsDisplay = true
+        }
+        .store(in: &self.cancellables)
     }
 }
 
