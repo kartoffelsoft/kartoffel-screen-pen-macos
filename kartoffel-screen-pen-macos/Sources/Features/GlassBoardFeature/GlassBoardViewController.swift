@@ -13,10 +13,15 @@ public class GlassBoardViewController: NSViewController {
     private let renderer: MTLRenderer
     private var cursor: NSCursor?
     
+    private var mtkView: MTKView {
+        return self.view as! MTKView
+    }
+    
     public init(store: StoreOf<GlassBoard>) {
         self.store = store
         self.viewStore = ViewStore(store, observe: { $0 })
         self.renderer = .init(device: MTLCreateSystemDefaultDevice())
+        
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -27,12 +32,17 @@ public class GlassBoardViewController: NSViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
 
+        mtkView.delegate = self
+        mtkView.enableSetNeedsDisplay = true
+        
         setupConstraints()
         setupBindings()
     }
 
     public override func viewWillAppear() {
         super.viewWillAppear()
+        self.view.setFrameOrigin(viewStore.frame.origin)
+        self.view.setFrameSize(viewStore.frame.size)
         self.view.window?.setFrame(viewStore.frame, display: true)
     }
     
@@ -47,11 +57,27 @@ public class GlassBoardViewController: NSViewController {
     }
     
     public override func loadView() {
-        let view = GlassBoardView(frame: .zero, device: MTLCreateSystemDefaultDevice())
-        view.uiDelegate = self
-        self.view = view
+        self.view = GlassBoardView(frame: .zero, device: MTLCreateSystemDefaultDevice())
+    }
+    
+    public override func keyDown(with event: NSEvent) {
+        if event.keyCode == 53 && event.type == .keyDown {
+            viewStore.send(.delegate(.dismiss))
+        }
+    }
+    
+    public override func mouseDown(with event: NSEvent) {
+        print("# mouseDown")
+    }
+    
+    public override func mouseUp(with event: NSEvent) {
+        print("# mouseUp")
     }
 
+    public override func mouseDragged(with event: NSEvent) {
+        print("# mouseDragged")
+    }
+    
     private func setupConstraints() {
     }
     
@@ -59,9 +85,13 @@ public class GlassBoardViewController: NSViewController {
     }
 }
 
-extension GlassBoardViewController: GlassBoardViewDelegate {
+extension GlassBoardViewController: MTKViewDelegate {
     
-    func didKeyUp() {
-        viewStore.send(.delegate(.dismiss))
+    public func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
+        print("# drawableSizeWillChange")
+    }
+
+    public func draw(in view: MTKView) {
+        print("# draw")
     }
 }

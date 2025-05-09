@@ -42,6 +42,7 @@ let package = Package(
         .target(
             name: "GlassBoardFeature",
             dependencies: [
+                "Drawables",
                 "MTLRenderer",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
             ],
@@ -49,10 +50,17 @@ let package = Package(
         ),
         
         .target(
+            name: "Drawables",
+            dependencies: [
+                "MTLRenderer"
+            ],
+            path: "./Sources/Graphics/Drawables"
+        ),
+        .target(
             name: "MTLRenderer",
             dependencies: [
             ],
-            path: "./Sources/Services/MTLRenderer",
+            path: "./Sources/Graphics/MTLRenderer",
             publicHeadersPath: "Public",
             cxxSettings: [
                 .unsafeFlags(["-std=c++20"]),
