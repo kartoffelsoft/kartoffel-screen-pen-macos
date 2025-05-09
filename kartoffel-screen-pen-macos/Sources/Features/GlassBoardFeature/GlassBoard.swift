@@ -1,15 +1,14 @@
+import Common
 import ComposableArchitecture
-import Drawables
 import Foundation
 
 public struct GlassBoard: Reducer {
     
     public struct State: Equatable, Identifiable {
         
-        
         public let id: UUID
         public let frame: NSRect
-        public let drawables: [AnyDrawable] = []
+        public let drawingData: [DrawingData] = []
         
         public init(id: UUID, frame: NSRect) {
             self.id = id

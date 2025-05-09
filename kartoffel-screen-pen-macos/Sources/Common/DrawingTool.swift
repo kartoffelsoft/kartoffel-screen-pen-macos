@@ -1,6 +1,6 @@
 import AppKit
 
-public enum Stationery: Equatable {
+public enum DrawingTool: Equatable {
     
     case pen(color: NSColor)
     case laserPointer

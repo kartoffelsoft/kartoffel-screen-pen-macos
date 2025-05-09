@@ -67,7 +67,7 @@ public class AppRootController {
         }
         .store(in: &self.cancellables)
         
-        viewStore.publisher.stationery.sink { [weak self] data in
+        viewStore.publisher.drawingTool.sink { [weak self] data in
             guard let self = self else { return }
             
             switch(data) {

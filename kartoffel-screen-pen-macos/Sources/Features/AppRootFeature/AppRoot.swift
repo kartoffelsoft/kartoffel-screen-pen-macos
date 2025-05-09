@@ -12,7 +12,7 @@ public struct AppRoot: Reducer {
         var glassBoards: IdentifiedArrayOf<GlassBoard.State> = []
         var menu: Menu.State = .init()
         var showGlassBoards: [UUID] = []
-        var stationery: Stationery = .none
+        var drawingTool: DrawingTool = .none
         
         public init() {}
     }
@@ -48,19 +48,19 @@ public struct AppRoot: Reducer {
             case let .glassBoards(id: id, action: .delegate(.dismiss)):
                 state.glassBoards.removeAll()
                 state.showGlassBoards.removeAll()
-                state.stationery = .none
+                state.drawingTool = .none
                 return .none
                 
             case .glassBoards:
                 return .none
 
             case .menu(.delegate(.selectPen)):
-                state.stationery = .pen(color: .white)
+                state.drawingTool = .pen(color: .white)
                 state.createGlassBoards.fire()
                 return .none
                 
             case .menu(.delegate(.selectLaserPointer)):
-                state.stationery = .laserPointer
+                state.drawingTool = .laserPointer
                 state.createGlassBoards.fire()
                 return .none
                 

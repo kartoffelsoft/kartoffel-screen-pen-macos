@@ -42,20 +42,13 @@ let package = Package(
         .target(
             name: "GlassBoardFeature",
             dependencies: [
-                "Drawables",
+                "Common",
                 "MTLRenderer",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
             ],
             path: "./Sources/Features/GlassBoardFeature"
         ),
         
-        .target(
-            name: "Drawables",
-            dependencies: [
-                "MTLRenderer"
-            ],
-            path: "./Sources/Graphics/Drawables"
-        ),
         .target(
             name: "MTLRenderer",
             dependencies: [
