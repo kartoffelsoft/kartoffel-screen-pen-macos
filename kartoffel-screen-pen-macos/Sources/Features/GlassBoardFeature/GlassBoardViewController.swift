@@ -67,21 +67,21 @@ public class GlassBoardViewController: NSViewController {
     }
     
     public override func mouseDown(with event: NSEvent) {
-        viewStore.send(.startDrawing(.init(
+        viewStore.send(.beginDraw(.init(
             x: event.locationInWindow.x,
             y: self.view.frame.size.height - event.locationInWindow.y
         )))
     }
     
     public override func mouseUp(with event: NSEvent) {
-        viewStore.send(.endDrawing(.init(
+        viewStore.send(.endDraw(.init(
             x: event.locationInWindow.x,
             y: self.view.frame.size.height - event.locationInWindow.y
         )))
     }
 
     public override func mouseDragged(with event: NSEvent) {
-        viewStore.send(.continueDrawing(.init(
+        viewStore.send(.continueDraw(.init(
             x: event.locationInWindow.x,
             y: self.view.frame.size.height - event.locationInWindow.y
         )))
@@ -91,9 +91,8 @@ public class GlassBoardViewController: NSViewController {
     }
     
     private func setupBindings() {
-        viewStore.publisher.drawings.sink { [weak self] data in
+        viewStore.publisher.drawings.sink { [weak self] drawings in
             guard let self = self else { return }
-            
             self.mtkView.needsDisplay = true
         }
         .store(in: &self.cancellables)
@@ -107,6 +106,49 @@ extension GlassBoardViewController: MTKViewDelegate {
     }
 
     public func draw(in view: MTKView) {
-        print("# draw")
+        guard let currentDrawable = self.mtkView.currentDrawable else { return }
+
+        renderer.beginDraw(
+            withSurfaceHandle: currentDrawable,
+            width: self.view.bounds.size.width,
+            height: self.view.bounds.size.height,
+            scale: self.view.window?.screen?.backingScaleFactor ?? NSScreen.main?.backingScaleFactor ?? 1.0
+        )
+        
+        for drawing in viewStore.drawings {
+            guard drawing.path.count >= 2 else { continue }
+            
+            self.renderer.pushClipRect(.init(
+                x: drawing.minX,
+                y: drawing.minY,
+                width: drawing.maxX - drawing.minX + 6,
+                height: drawing.maxY - drawing.minY + 6
+            ))
+            
+            switch drawing.drawingTool {
+            case let .pen(color):
+                ()
+                
+            case .laserPointer:
+                drawing.path.withUnsafeBufferPointer { buffer in
+                    guard let baseAddress = buffer.baseAddress else { return }
+                    self.renderer.addPolyline(
+                        withPath: baseAddress,
+                        count: drawing.path.count,
+                        color: .blue,
+                        thickness: 4.0
+                    )
+                }
+            
+            case .eraser:
+                ()
+            
+            default: ()
+            }
+            
+            self.renderer.popClipRect()
+        }
+        
+        renderer.endDraw()
     }
 }

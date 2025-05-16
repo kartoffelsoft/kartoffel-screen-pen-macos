@@ -19,9 +19,9 @@ public struct GlassBoard: Reducer {
     
     public enum Action {
         
-        case startDrawing(CGPoint)
-        case continueDrawing(CGPoint)
-        case endDrawing(CGPoint)
+        case beginDraw(CGPoint)
+        case continueDraw(CGPoint)
+        case endDraw(CGPoint)
         
         case delegate(DelegateAction)
         
@@ -37,19 +37,20 @@ public struct GlassBoard: Reducer {
     public var body: some Reducer<State, Action> {
         Reduce { state, action in
             switch action {
-            case let .startDrawing(point):
+            case let .beginDraw(point):
                 state.drawings.append(.init())
 
                 guard let lastIndex = state.drawings.indices.last else { return .none}
+                state.drawings[lastIndex].drawingTool = state.currentDrawingTool
                 state.drawings[lastIndex].add(point: point)
                 return .none
                 
-            case let .continueDrawing(point):
+            case let .continueDraw(point):
                 guard let lastIndex = state.drawings.indices.last else { return .none}
                 state.drawings[lastIndex].add(point: point)
                 return .none
             
-            case let .endDrawing(point):
+            case let .endDraw(point):
                 guard let lastIndex = state.drawings.indices.last else { return .none}
                 state.drawings[lastIndex].add(point: point)
                 return .none
