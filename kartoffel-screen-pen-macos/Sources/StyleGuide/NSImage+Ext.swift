@@ -6,6 +6,8 @@ extension NSImage {
 }
 
 public class NSImageTheme {
+
+    public let appIcon = Bundle.module.image(forResource: "app-icon")!
     
-    public let laserPointerCursor = Bundle.module.image(forResource:  "laser-pointer-cursor")!
+    public let laserPointerCursor = Bundle.module.image(forResource: "laser-pointer-cursor")!
 }

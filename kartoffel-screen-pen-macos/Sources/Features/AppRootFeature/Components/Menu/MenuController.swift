@@ -1,6 +1,7 @@
 import AppKit
 import Combine
 import ComposableArchitecture
+import StyleGuide
 
 @MainActor
 public class MenuController: NSObject {
@@ -9,7 +10,7 @@ public class MenuController: NSObject {
     private let viewStore: ViewStoreOf<Menu>
     
     private let statusBarItem = NSStatusBar.system.statusItem(
-        withLength: NSStatusItem.variableLength
+        withLength: 20
     )
 
     private var cancellables: Set<AnyCancellable> = []
@@ -60,10 +61,9 @@ public class MenuController: NSObject {
         mainMenu.addItem(quit)
 
         statusBarItem.menu = mainMenu
-        statusBarItem.button?.image = NSImage(
-            systemSymbolName: "applepencil.and.scribble",
-            accessibilityDescription: nil
-        )
+        statusBarItem.button?.image = .theme.appIcon
+        statusBarItem.button?.image?.size = NSSize(width: 18, height: 18) // optional, macOS often scales automatically
+        statusBarItem.button?.image?.isTemplate = true
     }
     
     private func setupBindings() {
