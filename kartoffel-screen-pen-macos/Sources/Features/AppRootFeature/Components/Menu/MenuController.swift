@@ -62,7 +62,7 @@ public class MenuController: NSObject {
 
         statusBarItem.menu = mainMenu
         statusBarItem.button?.image = .theme.appIcon
-        statusBarItem.button?.image?.size = NSSize(width: 18, height: 18) // optional, macOS often scales automatically
+        statusBarItem.button?.image?.size = NSSize(width: 16, height: 16)
         statusBarItem.button?.image?.isTemplate = true
     }
     
