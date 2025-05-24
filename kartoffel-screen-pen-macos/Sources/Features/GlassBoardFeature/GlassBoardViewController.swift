@@ -106,6 +106,8 @@ extension GlassBoardViewController: MTKViewDelegate {
     }
 
     public func draw(in view: MTKView) {
+        print("# draw")
+        
         guard let currentDrawable = self.mtkView.currentDrawable else { return }
 
         renderer.beginDraw(
@@ -130,6 +132,7 @@ extension GlassBoardViewController: MTKViewDelegate {
                 ()
                 
             case .laserPointer:
+                print("# laserPointer")
                 drawing.path.withUnsafeBufferPointer { buffer in
                     guard let baseAddress = buffer.baseAddress else { return }
                     self.renderer.addPolyline(

@@ -8,7 +8,7 @@ public struct GlassBoard: Reducer {
         
         public let id: UUID
         public let frame: NSRect
-        public var currentDrawingTool: DrawingTool = .pen(color: .blue)
+        public var currentDrawingTool: DrawingTool = .laserPointer
         public var drawings: [DrawingData] = []
         
         public init(id: UUID, frame: NSRect) {

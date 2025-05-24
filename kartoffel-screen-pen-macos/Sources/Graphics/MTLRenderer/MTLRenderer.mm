@@ -39,8 +39,6 @@
                       count:(NSInteger)count
                       color:(NSColor *)color
                   thickness:(CGFloat)thickness {
-    NSLog(@"# addPolylineWithPath");
-    
     std::vector<gui::layout::vec2_t> newPath;
     newPath.reserve(count);
 
@@ -52,19 +50,6 @@
     }
     
     _renderer->builder.add_polyline(newPath, {0xFF, 0xFF, 0x00, 0xFF}, thickness);
-    
-//    if(count < 2) {
-//        return;
-//    }
-    
-//    builder.push_clip_rect({_min_x - 3,
-//                            _min_y - 3,
-//                            _max_x - _min_x + 6,
-//                            _max_y - _min_y + 6});
-//    
-//    builder.add_polyline(_path, {0xFF, 0xFF, 0x00, 0xFF}, 6);
-//    
-//    builder.pop_clip_rect();
 }
 
 
