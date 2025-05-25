@@ -44,6 +44,7 @@ let package = Package(
             dependencies: [
                 "Common",
                 "MTLRenderer",
+                "StyleGuide",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
             ],
             path: "./Sources/Features/GlassBoardFeature"

@@ -1,8 +1,8 @@
 import Cocoa
 import Combine
 import ComposableArchitecture
-
 import MTLRenderer
+import StyleGuide
 
 public class GlassBoardViewController: NSViewController {
 
@@ -11,7 +11,6 @@ public class GlassBoardViewController: NSViewController {
     private var cancellables: Set<AnyCancellable> = []
     
     private let renderer: MTLRenderer
-    private var cursor: NSCursor?
     
     private var mtkView: MTKView {
         return self.view as! MTKView
@@ -48,7 +47,6 @@ public class GlassBoardViewController: NSViewController {
     
     public override func viewDidAppear() {
         super.viewDidAppear()
-        self.view.window?.makeKeyAndOrderFront(nil)
     }
     
     public override var representedObject: Any? {
@@ -91,6 +89,34 @@ public class GlassBoardViewController: NSViewController {
     }
     
     private func setupBindings() {
+        viewStore.publisher.currentDrawingTool.sink { [weak self] tool in
+            guard let self = self else { return }
+            guard let view = self.view as? GlassBoardView else { return }
+            
+            switch(tool) {
+            case .pen:
+                let image = NSImage.theme.appIcon
+                image.size = NSSize(width: 20, height: 20)
+                view.cursor = NSCursor(image: image, hotSpot: NSPoint(x: 10, y: 10))
+                view.resetCursorRects()
+                break
+                
+            case .laserPointer:
+                let image = NSImage.theme.laserPointerCursor
+                image.size = NSSize(width: 20, height: 20)
+                view.cursor = NSCursor(image: image, hotSpot: NSPoint(x: 10, y: 10))
+                view.resetCursorRects()
+                break
+                
+            case .eraser:
+                break
+                
+            case .none:
+                break
+            }
+        }
+        .store(in: &self.cancellables)
+        
         viewStore.publisher.drawings.sink { [weak self] drawings in
             guard let self = self else { return }
             self.mtkView.needsDisplay = true
@@ -102,12 +128,9 @@ public class GlassBoardViewController: NSViewController {
 extension GlassBoardViewController: MTKViewDelegate {
     
     public func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
-        print("# drawableSizeWillChange")
     }
 
     public func draw(in view: MTKView) {
-        print("# draw")
-        
         guard let currentDrawable = self.mtkView.currentDrawable else { return }
 
         renderer.beginDraw(
@@ -132,7 +155,6 @@ extension GlassBoardViewController: MTKViewDelegate {
                 ()
                 
             case .laserPointer:
-                print("# laserPointer")
                 drawing.path.withUnsafeBufferPointer { buffer in
                     guard let baseAddress = buffer.baseAddress else { return }
                     self.renderer.addPolyline(
