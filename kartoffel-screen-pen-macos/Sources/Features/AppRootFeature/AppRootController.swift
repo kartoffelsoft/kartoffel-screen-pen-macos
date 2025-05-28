@@ -3,8 +3,8 @@ import AppKitUtils
 import Combine
 import ComposableArchitecture
 import GlassBoardFeature
+import LocalEventMonitorFeature
 
-@MainActor
 public class AppRootController {
 
     private let store: StoreOf<AppRoot>
@@ -12,11 +12,18 @@ public class AppRootController {
     private var cancellables: Set<AnyCancellable> = []
     
     private var glassBoardWindowControllers: IdentifiedArrayOf<GlassBoardWindowController> = []
+    private let localEventMonitorController: LocalEventMonitorController
     private let menuController: MenuController
 
+    @MainActor
     public init(store: StoreOf<AppRoot>) {
         self.store = store
         self.viewStore = ViewStore(store, observe: { $0 })
+        
+        self.localEventMonitorController = .init(store: self.store.scope(
+            state: \.localEventMonitor,
+            action: AppRoot.Action.localEventMonitor
+        ))
         
         self.menuController = .init(store: self.store.scope(
             state: \.menu,
@@ -28,8 +35,9 @@ public class AppRootController {
         setupBindings()
     }
     
+    @MainActor
     private func setupBindings() {
-        viewStore.publisher.createGlassBoards.sink { [weak self] data in
+        viewStore.publisher.createGlassBoardsSignal.sink { [weak self] data in
             guard data.isValid else { return }
             guard let self = self else { return }
             self.viewStore.send(.createGlassBoards(NSScreen.screens.map{$0.frame}))

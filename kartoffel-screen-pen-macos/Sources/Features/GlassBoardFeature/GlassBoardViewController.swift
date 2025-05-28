@@ -40,7 +40,8 @@ public class GlassBoardViewController: NSViewController {
 
     public override func viewWillAppear() {
         super.viewWillAppear()
-        self.view.setFrameOrigin(viewStore.frame.origin)
+        
+        self.view.setFrameOrigin(.zero)
         self.view.setFrameSize(viewStore.frame.size)
         self.view.window?.setFrame(viewStore.frame, display: true)
     }

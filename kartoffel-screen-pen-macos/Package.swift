@@ -34,6 +34,7 @@ let package = Package(
                 "AppKitUtils",
                 "Common",
                 "GlassBoardFeature",
+                "LocalEventMonitorFeature",
                 "StyleGuide",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
             ],
@@ -48,6 +49,13 @@ let package = Package(
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
             ],
             path: "./Sources/Features/GlassBoardFeature"
+        ),
+        .target(
+            name: "LocalEventMonitorFeature",
+            dependencies: [
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+            ],
+            path: "./Sources/Features/LocalEventMonitorFeature"
         ),
         
         .target(
