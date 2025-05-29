@@ -145,10 +145,10 @@ extension GlassBoardViewController: MTKViewDelegate {
             guard drawing.path.count >= 2 else { continue }
             
             self.renderer.pushClipRect(.init(
-                x: drawing.minX,
-                y: drawing.minY,
-                width: drawing.maxX - drawing.minX + 6,
-                height: drawing.maxY - drawing.minY + 6
+                x: drawing.minX - 4,
+                y: drawing.minY - 4,
+                width: drawing.maxX - drawing.minX + 8,
+                height: drawing.maxY - drawing.minY + 8
             ))
             
             switch drawing.drawingTool {
