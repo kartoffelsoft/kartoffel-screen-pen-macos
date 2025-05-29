@@ -62,6 +62,11 @@ public struct AppRoot: Reducer {
             case .glassBoards:
                 return .none
 
+                
+            case .localEventMonitor(.delegate(.mouseMoved(let point))):
+                
+                return .none
+                
             case .localEventMonitor:
                 return .none
                 

@@ -19,7 +19,7 @@ public struct LocalEventMonitor: Reducer {
         
         public enum DelegateAction: Equatable {
             
-            case dismiss
+            case mouseMoved(NSPoint)
         }
     }
 
