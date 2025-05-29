@@ -31,7 +31,7 @@ public class LocalEventMonitorController {
             
             if isActive {
                 self.monitor = NSEvent.addLocalMonitorForEvents(matching: [.mouseMoved], handler: { event in
-                    self.viewStore.send(.delegate(.mouseMoved(event.locationInWindow)))
+                    self.viewStore.send(.delegate(.mouseLocation(NSEvent.mouseLocation)))
                     return event;
                 })
             }

@@ -7,7 +7,8 @@ import LocalEventMonitorFeature
 public struct AppRoot: Reducer {
 
     public struct State: Equatable {
-        
+
+        var activeBoardId: UUID?
         var appRootDelegate: AppRootDelegate.State = .init()
         var createGlassBoardsSignal: Signal = .init()
         var glassBoards: IdentifiedArrayOf<GlassBoard.State> = []
@@ -40,7 +41,7 @@ public struct AppRoot: Reducer {
                     state.glassBoards.append(.init(id: id, frame: frame))
                     state.showGlassBoards.append(id)
                 }
-                
+
                 return .run { send in
                     await send(.localEventMonitor(.activate))
                 }
@@ -63,8 +64,12 @@ public struct AppRoot: Reducer {
                 return .none
 
                 
-            case .localEventMonitor(.delegate(.mouseMoved(let point))):
-                
+            case .localEventMonitor(.delegate(.mouseLocation(let location))):
+                for board in state.glassBoards {
+                    if board.frame.contains(location) {
+                        state.activeBoardId = board.id
+                    }
+                }
                 return .none
                 
             case .localEventMonitor:

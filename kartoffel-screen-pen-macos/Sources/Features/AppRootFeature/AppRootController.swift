@@ -37,6 +37,13 @@ public class AppRootController {
     
     @MainActor
     private func setupBindings() {
+        viewStore.publisher.activeBoardId.sink { [weak self] id in
+            guard let self = self else { return }
+            guard let id = id else { return }
+            glassBoardWindowControllers[id: id]?.window?.makeKeyAndOrderFront(nil)
+        }
+        .store(in: &self.cancellables)
+        
         viewStore.publisher.createGlassBoardsSignal.sink { [weak self] data in
             guard data.isValid else { return }
             guard let self = self else { return }
