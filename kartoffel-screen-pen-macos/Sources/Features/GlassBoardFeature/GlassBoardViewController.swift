@@ -121,12 +121,58 @@ public class GlassBoardViewController: NSViewController {
         
         viewStore.publisher.drawings.sink { [weak self] drawings in
             guard let self = self else { return }
+            guard let canvas = self.canvas else { return }
+            guard let drawing = drawings.last else { return }
+            
+            let path = Array(drawing.path.suffix(9))
+            guard path.count >= 2 else { return }
+            
+            renderer.beginDraw(
+                onTexture: canvas,
+                width: view.bounds.width,
+                height: view.bounds.height,
+                scale: self.view.window?.screen?.backingScaleFactor ?? NSScreen.main?.backingScaleFactor ?? 1.0
+            )
+            
+            self.renderer.pushClipRect(.init(
+                x: 0,
+                y: 0,
+                width: view.bounds.width,
+                height: view.bounds.height,
+            ))
+            
+            switch drawing.drawingTool {
+            case let .pen(color):
+                ()
+                
+            case .laserPointer:
+                path.withUnsafeBufferPointer { buffer in
+                    guard let baseAddress = buffer.baseAddress else { return }
+                    self.renderer.addPolyline(
+                        with: baseAddress,
+                        count: path.count,
+                        color: .blue,
+                        thickness: 4.0
+                    )
+                }
+                
+            case .eraser:
+                ()
+                
+            default: ()
+            }
+            
+            self.renderer.popClipRect()
+            
+            renderer.endDraw()
+            
             self.mtkView.needsDisplay = true
         }
         .store(in: &self.cancellables)
     }
     
     private func setupCanvas(with size: CGSize) {
+        print("canvas #: ", size)
         let desc = MTLTextureDescriptor.texture2DDescriptor(
             pixelFormat: .bgra8Unorm,
             width: Int(size.width),
@@ -146,48 +192,15 @@ extension GlassBoardViewController: MTKViewDelegate {
 
     public func draw(in view: MTKView) {
         guard let currentDrawable = mtkView.currentDrawable else { return }
+        guard let canvas = canvas else { return }
         
         renderer.beginDraw(
             onDrawable: currentDrawable,
-            width: self.view.bounds.size.width,
-            height: self.view.bounds.size.height,
-            scale: self.view.window?.screen?.backingScaleFactor ?? NSScreen.main?.backingScaleFactor ?? 1.0
+            width: view.bounds.size.width,
+            height: view.bounds.size.height,
+            scale: view.window?.screen?.backingScaleFactor ?? NSScreen.main?.backingScaleFactor ?? 1.0
         )
-        
-        for drawing in viewStore.drawings {
-            guard drawing.path.count >= 2 else { continue }
-            
-            self.renderer.pushClipRect(.init(
-                x: drawing.minX - 4,
-                y: drawing.minY - 4,
-                width: drawing.maxX - drawing.minX + 8,
-                height: drawing.maxY - drawing.minY + 8
-            ))
-            
-            switch drawing.drawingTool {
-            case let .pen(color):
-                ()
-                
-            case .laserPointer:
-                drawing.path.withUnsafeBufferPointer { buffer in
-                    guard let baseAddress = buffer.baseAddress else { return }
-                    self.renderer.addPolyline(
-                        withPath: baseAddress,
-                        count: drawing.path.count,
-                        color: .blue,
-                        thickness: 4.0
-                    )
-                }
-            
-            case .eraser:
-                ()
-            
-            default: ()
-            }
-            
-            self.renderer.popClipRect()
-        }
-        
+
         renderer.endDraw()
     }
 }

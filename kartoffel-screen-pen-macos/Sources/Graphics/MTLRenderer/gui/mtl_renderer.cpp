@@ -132,8 +132,15 @@ void mtl_renderer_t::end_draw()
         };
         _encoder->setScissorRect(scissorRect);
 
-        _encoder->setFragmentTexture(_default_texture.get(), 0);
-        
+        if(command.texture_id)
+        {
+            _encoder->setFragmentTexture(reinterpret_cast<const MTL::Texture *>(command.texture_id), 0);
+        }
+        else
+        {
+            _encoder->setFragmentTexture(_default_texture.get(), 0);
+        }
+
         _encoder->drawIndexedPrimitives(MTL::PrimitiveTypeTriangleStrip,
                                        command.count,
                                        MTL::IndexTypeUInt32,

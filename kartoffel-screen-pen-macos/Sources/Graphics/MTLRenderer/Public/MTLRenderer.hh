@@ -22,10 +22,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)endDraw;
 
-- (void)addPolylineWithPath:(const CGPoint *)path
-                      count:(NSInteger)count
-                      color:(NSColor *)color
-                  thickness:(CGFloat)thickness;
+- (void)addPolylineWith:(const CGPoint *)path
+                  count:(NSInteger)count
+                  color:(NSColor *)color
+              thickness:(CGFloat)thickness;
+
+- (void)addTextureWith:(id<MTLTexture>)texture
+                    p1:(CGPoint)p1
+                    p2:(CGPoint)p2
+                 color:(NSColor *)color;
 
 - (void)pushClipRect:(CGRect)rect;
 - (void)popClipRect;

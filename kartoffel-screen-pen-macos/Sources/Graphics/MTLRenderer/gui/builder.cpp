@@ -75,6 +75,43 @@ void builder_t::add_polyline(const std::vector<gui::layout::vec2_t> &path,
     commands.back().count = static_cast<uint32_t>(indices.size() - index_buffer_offset);
 }
 
+void builder_t::add_texture(gui::asset::texture_id_t tid,
+                            const gui::layout::vec2_t &p1,
+                            const gui::layout::vec2_t &p2,
+                            const gui::layout::color_t &color)
+{
+    uint32_t index_buffer_offset = indices.size();
+    uint32_t vertex_buffer_offset = vertices.size();
+    
+    commands.emplace_back(0,
+                          index_buffer_offset,
+                          vertex_buffer_offset,
+                          get_clip_rect_top(),
+                          tid);
+
+    vertices.emplace_back(gui::layout::vec2_t{p1.x, p1.y},
+                          gui::layout::vec2_t{0, 0},
+                          color);
+    vertices.emplace_back(gui::layout::vec2_t{p2.x, p1.y},
+                          gui::layout::vec2_t{1, 0},
+                          color);
+    vertices.emplace_back(gui::layout::vec2_t{p1.x, p2.y},
+                          gui::layout::vec2_t{0, 1},
+                          color);
+    vertices.emplace_back(gui::layout::vec2_t{p2.x, p2.y},
+                          gui::layout::vec2_t{1, 1},
+                          color);
+
+    indices.insert(indices.end(), { vertex_buffer_offset + 0,
+                                    vertex_buffer_offset + 1,
+                                    vertex_buffer_offset + 2 });
+    indices.insert(indices.end(), { vertex_buffer_offset + 1,
+                                    vertex_buffer_offset + 2,
+                                    vertex_buffer_offset + 3 });
+
+    commands.back().count = indices.size() - index_buffer_offset;
+}
+
 void builder_t::push_clip_rect(const gui::layout::rect_t &rect)
 {
     _clip_rect_stack.push_back(rect);

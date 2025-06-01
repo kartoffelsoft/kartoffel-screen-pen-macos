@@ -52,10 +52,10 @@
     _renderer->end_draw();
 }
 
-- (void)addPolylineWithPath:(const CGPoint *)path
-                      count:(NSInteger)count
-                      color:(NSColor *)color
-                  thickness:(CGFloat)thickness {
+- (void)addPolylineWith:(const CGPoint *)path
+                  count:(NSInteger)count
+                  color:(NSColor *)color
+              thickness:(CGFloat)thickness {
     std::vector<gui::layout::vec2_t> newPath;
     newPath.reserve(count);
 
@@ -69,6 +69,12 @@
     _renderer->builder.add_polyline(newPath, {0xFF, 0xFF, 0x00, 0xFF}, thickness);
 }
 
+- (void)addTextureWith:(id<MTLTexture>)texture
+                    p1:(CGPoint)p1
+                    p2:(CGPoint)p2
+                 color:(NSColor *)color {
+    
+}
 
 - (void)pushClipRect:(CGRect)rect {
     _renderer->builder.push_clip_rect({

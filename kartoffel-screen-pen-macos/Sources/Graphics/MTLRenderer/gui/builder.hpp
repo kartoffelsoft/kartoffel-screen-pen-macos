@@ -1,6 +1,7 @@
 #pragma once
 
 #include "command.hpp"
+#include "asset/texture_id.hpp"
 #include "layout/color.hpp"
 #include "layout/index.hpp"
 #include "layout/rect.hpp"
@@ -25,6 +26,11 @@ public:
     void add_polyline(const std::vector<gui::layout::vec2_t> &path,
                       const gui::layout::color_t &color,
                       float thickness);
+    
+    void add_texture(gui::asset::texture_id_t tid,
+                     const gui::layout::vec2_t &p1,
+                     const gui::layout::vec2_t &p2,
+                     const gui::layout::color_t &color);
     
     void push_clip_rect(const gui::layout::rect_t &rect);
     void pop_clip_rect();
