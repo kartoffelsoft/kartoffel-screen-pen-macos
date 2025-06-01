@@ -15,8 +15,8 @@ mtl_renderer_t::mtl_renderer_t(MTL::Device* device)
       _command_queue{nullptr, [](MTL::CommandQueue *ptr) { if (ptr) ptr->release(); }},
       _render_pipeline{nullptr, [](MTL::RenderPipelineState *ptr) { if (ptr) ptr->release(); }},
       _depth_stencil{nullptr, [](MTL::DepthStencilState *ptr) { if (ptr) ptr->release(); }},
-      _texture{nullptr, [](MTL::Texture *ptr) { if (ptr) ptr->release(); }},
-      _surface{nullptr},
+      _default_texture{nullptr, [](MTL::Texture *ptr) { if (ptr) ptr->release(); }},
+      _target_drawable{nullptr},
       _display_scale{},
       _command_buffer{nullptr},
       _encoder{nullptr}
@@ -34,13 +34,24 @@ mtl_renderer_t::~mtl_renderer_t()
 
 void mtl_renderer_t::begin_draw(const gui::context_t &ctx)
 {
-    _surface = reinterpret_cast<CA::MetalDrawable *>(ctx.surface_handle);
+    switch(ctx.type)
+    {
+        case context_type_display:
+            _target_drawable = reinterpret_cast<CA::MetalDrawable *>(ctx.handle);
+            _target_texture = _target_drawable->texture();
+            break;
+        case context_type_texture:
+            _target_drawable = nullptr;
+            _target_texture = reinterpret_cast<MTL::Texture *>(ctx.handle);
+            break;
+    }
+    
     _display_scale = ctx.display_scale;
     
     _command_buffer = _command_queue->commandBuffer();
     MTL::RenderPassDescriptor *desc = MTL::RenderPassDescriptor::alloc()->init();
 
-    desc->colorAttachments()->object(0)->setTexture(_surface->texture());
+    desc->colorAttachments()->object(0)->setTexture(_target_texture);
     desc->colorAttachments()->object(0)->setLoadAction(MTL::LoadActionClear);
     desc->colorAttachments()->object(0)->setClearColor(MTL::ClearColor::Make(0.0f, 0.0f, 0.0f, 0.0f));
     
@@ -121,7 +132,7 @@ void mtl_renderer_t::end_draw()
         };
         _encoder->setScissorRect(scissorRect);
 
-        _encoder->setFragmentTexture(_texture.get(), 0);
+        _encoder->setFragmentTexture(_default_texture.get(), 0);
         
         _encoder->drawIndexedPrimitives(MTL::PrimitiveTypeTriangleStrip,
                                        command.count,
@@ -139,7 +150,11 @@ void mtl_renderer_t::end_draw()
     _encoder->popDebugGroup();
     _encoder->endEncoding();
     
-    _command_buffer->presentDrawable(_surface);
+    if(_target_drawable)
+    {
+        _command_buffer->presentDrawable(_target_drawable);
+    }
+
     _command_buffer->commit();
 }
 
@@ -158,10 +173,10 @@ void mtl_renderer_t::setup_default_texture()
     desc->setWidth(1);
     desc->setHeight(1);
     desc->setUsage(MTL::TextureUsageShaderRead);
-    _texture.reset(_device->newTexture(desc));
-    uint8_t whitePixel[4] = {255, 255, 255, 255};
+    _default_texture.reset(_device->newTexture(desc));
+    uint8_t white_piexel[4] = {255, 255, 255, 255};
     MTL::Region region = MTL::Region::Make3D(0, 0, 0, 1, 1, 1);
-    _texture->replaceRegion(region, 0, whitePixel, 4);
+    _default_texture->replaceRegion(region, 0, white_piexel, 4);
 }
 
 void mtl_renderer_t::setup_render_pipeline()

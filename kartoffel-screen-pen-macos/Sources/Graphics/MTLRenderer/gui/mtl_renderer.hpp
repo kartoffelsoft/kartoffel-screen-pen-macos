@@ -34,10 +34,10 @@ private:
     command_queue_ref_t _command_queue;
     pipeline_ref_t _render_pipeline;
     depth_stencil_ref_t _depth_stencil;
-    texture_ref_t _texture;
+    texture_ref_t _default_texture;
     
-
-    CA::MetalDrawable *_surface;
+    CA::MetalDrawable *_target_drawable;
+    MTL::Texture *_target_texture;
     gui::layout::vec2_t _display_scale;
     MTL::CommandBuffer *_command_buffer;
     MTL::RenderCommandEncoder *_encoder;

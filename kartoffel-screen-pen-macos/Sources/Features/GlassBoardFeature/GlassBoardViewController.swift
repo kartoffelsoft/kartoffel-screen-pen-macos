@@ -11,6 +11,7 @@ public class GlassBoardViewController: NSViewController {
     private var cancellables: Set<AnyCancellable> = []
     
     private let renderer: MTLRenderer
+    private var canvas: MTLTexture?
     
     private var mtkView: MTKView {
         return self.view as! MTKView
@@ -124,18 +125,30 @@ public class GlassBoardViewController: NSViewController {
         }
         .store(in: &self.cancellables)
     }
+    
+    private func setupCanvas(with size: CGSize) {
+        let desc = MTLTextureDescriptor.texture2DDescriptor(
+            pixelFormat: .bgra8Unorm,
+            width: Int(size.width),
+            height: Int(size.height),
+            mipmapped: false
+        )
+        desc.usage = [.renderTarget, .shaderRead, .shaderWrite]
+        canvas = mtkView.device?.makeTexture(descriptor: desc)
+    }
 }
 
 extension GlassBoardViewController: MTKViewDelegate {
     
     public func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
+        setupCanvas(with: size)
     }
 
     public func draw(in view: MTKView) {
-        guard let currentDrawable = self.mtkView.currentDrawable else { return }
-
+        guard let currentDrawable = mtkView.currentDrawable else { return }
+        
         renderer.beginDraw(
-            withSurfaceHandle: currentDrawable,
+            onDrawable: currentDrawable,
             width: self.view.bounds.size.width,
             height: self.view.bounds.size.height,
             scale: self.view.window?.screen?.backingScaleFactor ?? NSScreen.main?.backingScaleFactor ?? 1.0

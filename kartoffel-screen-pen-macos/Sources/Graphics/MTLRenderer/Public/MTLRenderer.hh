@@ -8,10 +8,18 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithDevice:(nullable id<MTLDevice>)device;
 
-- (void)beginDrawWithSurfaceHandle:(id<CAMetalDrawable>)handle
-                             width:(CGFloat)width
-                            height:(CGFloat)height
-                             scale:(CGFloat)scale;
+- (void)beginDrawOnDrawable:(id<CAMetalDrawable>)drawable
+                      width:(CGFloat)width
+                     height:(CGFloat)height
+                      scale:(CGFloat)scale
+  NS_SWIFT_NAME(beginDraw(onDrawable:width:height:scale:));
+
+- (void)beginDrawOnTexture:(id<MTLTexture>)handle
+                     width:(CGFloat)width
+                    height:(CGFloat)height
+                     scale:(CGFloat)scale
+  NS_SWIFT_NAME(beginDraw(onTexture:width:height:scale:));
+
 - (void)endDraw;
 
 - (void)addPolylineWithPath:(const CGPoint *)path

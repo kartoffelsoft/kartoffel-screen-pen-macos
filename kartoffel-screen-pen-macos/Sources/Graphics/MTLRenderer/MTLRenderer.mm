@@ -18,12 +18,29 @@
     return self;
 }
 
-- (void)beginDrawWithSurfaceHandle:(id<CAMetalDrawable>)handle
-                             width:(CGFloat)width
-                            height:(CGFloat)height
-                             scale:(CGFloat)scale {
+- (void)beginDrawOnDrawable:(id<CAMetalDrawable>)drawable
+                      width:(CGFloat)width
+                     height:(CGFloat)height
+                      scale:(CGFloat)scale {
     gui::context_t context;
-    context.surface_handle = (gui::surface_handle_t)(__bridge CA::MetalDrawable *)handle;
+    
+    context.type = gui::context_type_display;
+    context.handle = (gui::context_handle_t)(__bridge CA::MetalDrawable *)drawable;
+    
+    context.display_size = gui::layout::size_t{(float)width, (float)height};
+    context.display_scale = gui::layout::vec2_t{(float)scale, (float)scale};
+
+    _renderer->begin_draw(context);
+}
+
+- (void)beginDrawOnTexture:(id<MTLTexture>)texture
+                     width:(CGFloat)width
+                    height:(CGFloat)height
+                     scale:(CGFloat)scale {
+    gui::context_t context;
+    
+    context.type = gui::context_type_texture;
+    context.handle = (gui::context_handle_t)(__bridge MTL::Texture *)texture;
     
     context.display_size = gui::layout::size_t{(float)width, (float)height};
     context.display_scale = gui::layout::vec2_t{(float)scale, (float)scale};
