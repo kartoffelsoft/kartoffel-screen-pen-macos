@@ -3,6 +3,7 @@ import ComposableArchitecture
 import Foundation
 import GlassBoardFeature
 import LocalEventMonitorFeature
+import MenuFeature
 
 public struct AppRoot: Reducer {
 

@@ -35,6 +35,7 @@ let package = Package(
                 "Common",
                 "GlassBoardFeature",
                 "LocalEventMonitorFeature",
+                "MenuFeature",
                 "StyleGuide",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
             ],
@@ -51,11 +52,27 @@ let package = Package(
             path: "./Sources/Features/GlassBoardFeature"
         ),
         .target(
+            name: "HotKeyFeature",
+            dependencies: [
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+            ],
+            path: "./Sources/Features/HotKeyFeature"
+        ),
+        .target(
             name: "LocalEventMonitorFeature",
             dependencies: [
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
             ],
             path: "./Sources/Features/LocalEventMonitorFeature"
+        ),
+        .target(
+            name: "MenuFeature",
+            dependencies: [
+                "HotKeyFeature",
+                "StyleGuide",
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+            ],
+            path: "./Sources/Features/MenuFeature"
         ),
         
         .target(

@@ -1,7 +1,8 @@
 import ComposableArchitecture
+import Foundation
 
-public struct Menu: Reducer {
-    
+public struct HotKey: Reducer {
+
     public struct State: Equatable {
         
         public init() {}
@@ -9,25 +10,23 @@ public struct Menu: Reducer {
     
     public enum Action {
         
-        case start
+        case register
         
         case delegate(DelegateAction)
         
         public enum DelegateAction: Equatable {
             
-            case selectPen
-            case selectLaserPointer
+            case hotKeyDown
         }
     }
-    
+
     public init() {}
     
     public var body: some Reducer<State, Action> {
         Reduce { state, action in
             switch action {
-            case .start:
-                return .run { send in
-                }
+            case .register:
+                return .none
                 
             case .delegate:
                 return .none

@@ -1,6 +1,7 @@
 import AppKit
 import Combine
 import ComposableArchitecture
+import HotKeyFeature
 import StyleGuide
 
 @MainActor
@@ -8,16 +9,19 @@ public class MenuController: NSObject {
 
     private let store: StoreOf<Menu>
     private let viewStore: ViewStoreOf<Menu>
-    
-    private let statusBarItem = NSStatusBar.system.statusItem(
-        withLength: 20
-    )
-
     private var cancellables: Set<AnyCancellable> = []
     
+    private let hotKeyController: HotKeyController
+    private let statusBarItem = NSStatusBar.system.statusItem(withLength: 20)
+
     public init(store: StoreOf<Menu>) {
         self.store = store
         self.viewStore = ViewStore(store, observe: { $0 })
+        
+        self.hotKeyController = .init(store: self.store.scope(
+            state: \.hotKey,
+            action: Menu.Action.hotKey
+        ))
         
         super.init()
         setupBindings()

@@ -21,6 +21,7 @@ public struct GlassBoard: Reducer {
         
         case beginDraw(CGPoint)
         case continueDraw(CGPoint)
+        case dismiss
         case endDraw(CGPoint)
         
         case delegate(DelegateAction)
@@ -50,6 +51,11 @@ public struct GlassBoard: Reducer {
                 state.drawings[lastIndex].add(point: point)
                 return .none
             
+            case .dismiss:
+                return .run { send in
+                    await send(.delegate(.dismiss))
+                }
+                
             case let .endDraw(point):
                 guard let lastIndex = state.drawings.indices.last else { return .none}
                 state.drawings[lastIndex].add(point: point)

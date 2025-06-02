@@ -4,6 +4,7 @@ import Combine
 import ComposableArchitecture
 import GlassBoardFeature
 import LocalEventMonitorFeature
+import MenuFeature
 
 public class AppRootController {
 

@@ -62,7 +62,7 @@ public class GlassBoardViewController: NSViewController {
     
     public override func keyDown(with event: NSEvent) {
         if event.keyCode == 53 && event.type == .keyDown {
-            viewStore.send(.delegate(.dismiss))
+            viewStore.send(.dismiss)
         }
     }
     
@@ -172,7 +172,6 @@ public class GlassBoardViewController: NSViewController {
     }
     
     private func setupCanvas(with size: CGSize) {
-        print("canvas #: ", size)
         let desc = MTLTextureDescriptor.texture2DDescriptor(
             pixelFormat: .bgra8Unorm,
             width: Int(size.width),
@@ -192,7 +191,6 @@ extension GlassBoardViewController: MTKViewDelegate {
 
     public func draw(in view: MTKView) {
         guard let currentDrawable = mtkView.currentDrawable else { return }
-        guard let canvas = canvas else { return }
         
         renderer.beginDraw(
             onDrawable: currentDrawable,
