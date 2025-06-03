@@ -36,7 +36,7 @@ public class MenuController: NSObject {
         let pen = NSMenuItem(
             title: "Pen",
             action: #selector(handlePenClick),
-            keyEquivalent: ""
+            keyEquivalent: "p"
         )
         pen.target = self
         mainMenu.addItem(pen)
@@ -44,7 +44,7 @@ public class MenuController: NSObject {
         let laserPointer = NSMenuItem(
             title: "Laser Pointer",
             action: #selector(handleLaserPointerClick),
-            keyEquivalent: ""
+            keyEquivalent: "l"
         )
         laserPointer.target = self
         mainMenu.addItem(laserPointer)
@@ -62,17 +62,27 @@ public class MenuController: NSObject {
         let quit = NSMenuItem(
             title: "Quit Screen Pen",
             action: #selector(NSApp.terminate(_:)),
-            keyEquivalent: ""
+            keyEquivalent: "q"
         )
         mainMenu.addItem(quit)
 
         statusBarItem.menu = mainMenu
+        statusBarItem.menu?.delegate = self
         statusBarItem.button?.image = .theme.appIcon
         statusBarItem.button?.image?.size = NSSize(width: 16, height: 16)
         statusBarItem.button?.image?.isTemplate = true
     }
     
     private func setupBindings() {
+        viewStore.publisher.openMenuSignal.sink { [weak self] signal in
+            guard signal.isValid else { return }
+            guard let self = self else { return }
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                self.statusBarItem.button?.performClick(self)
+            }
+        }
+        .store(in: &self.cancellables)
     }
 
     @objc private func handlePenClick(_ sender: NSMenuItem) {
@@ -91,6 +101,10 @@ public class MenuController: NSObject {
 extension MenuController: NSMenuDelegate {
     
     public func menuWillOpen(_ menu: NSMenu) {
-        viewStore.send(.start)
+        viewStore.send(.deactivateHotKey)
+    }
+    
+    public func menuDidClose(_ menu: NSMenu) {
+        viewStore.send(.activateHotKey)
     }
 }

@@ -48,7 +48,9 @@ public struct AppRoot: Reducer {
                 }
                 
             case .appRootDelegate(.delegate(.start)):
-                return .none
+                return .run { send in
+                    await send(.menu(.setup))
+                }
                 
             case .appRootDelegate:
                 return .none

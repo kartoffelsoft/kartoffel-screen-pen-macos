@@ -1,6 +1,6 @@
 import AppKit
 
-public struct HotKeyEntry: Equatable, Identifiable {
+public struct HotKeyEntry: Equatable, Identifiable, Sendable {
     
     public let id: UInt32
     public var keyEquivalent: String

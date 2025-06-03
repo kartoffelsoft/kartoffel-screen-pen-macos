@@ -43,8 +43,8 @@ public class AppRootController {
         }
         .store(in: &self.cancellables)
         
-        viewStore.publisher.createGlassBoardsSignal.sink { [weak self] data in
-            guard data.isValid else { return }
+        viewStore.publisher.createGlassBoardsSignal.sink { [weak self] signal in
+            guard signal.isValid else { return }
             guard let self = self else { return }
             self.viewStore.send(.createGlassBoards(NSScreen.screens.map{$0.frame}))
         }

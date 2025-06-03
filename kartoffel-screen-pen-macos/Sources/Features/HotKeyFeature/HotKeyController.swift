@@ -74,7 +74,7 @@ public class HotKeyController {
 
     private func cleanup() {
         for ref in eventHotKeyRefs {
-            RemoveEventHandler(ref)
+            UnregisterEventHotKey(ref)
         }
         eventHotKeyRefs.removeAll()
     }

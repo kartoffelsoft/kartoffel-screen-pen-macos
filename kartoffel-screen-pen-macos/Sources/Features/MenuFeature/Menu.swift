@@ -1,3 +1,4 @@
+import Common
 import ComposableArchitecture
 import HotKeyFeature
 
@@ -5,30 +6,27 @@ public struct Menu: Reducer {
     
     public struct State: Equatable {
         
-        var hotKey: HotKey.State
+        var hotKey: HotKey.State = .init()
+        var openMenuSignal: Signal = .init()
         
         let hotKeyEntries: [HotKeyEntry] = [
             .init(
-                id: MenuKey.pen.rawValue,
+                id: MenuKey.openMenu.rawValue,
                 keyEquivalent: "p",
-                keyEquivalentModifierMask: [.control, .option, .command]
-            ),
-            .init(
-                id: MenuKey.laserPointer.rawValue,
-                keyEquivalent: "l",
                 keyEquivalentModifierMask: [.control, .option, .command]
             ),
         ]
         
-        public init() {
-            self.hotKey = .init(entries: hotKeyEntries)
-        }
+        public init() {}
     }
     
     public enum Action {
 
+        case activateHotKey
+        case deactivateHotKey
         case hotKey(HotKey.Action)
-        case start
+        case openMenu
+        case setup
         
         case delegate(DelegateAction)
         
@@ -44,14 +42,25 @@ public struct Menu: Reducer {
     public var body: some Reducer<State, Action> {
         Reduce { state, action in
             switch action {
+            case .activateHotKey:
+                return .run { [entries = state.hotKeyEntries] send in
+                    await send(.hotKey(.register(entries)))
+                }
+                
+            case .deactivateHotKey:
+                return .run { send in
+                    await send(.hotKey(.unregister))
+                }
+            
             case let .hotKey(.delegate(.hotKeyDown(id))):
                 guard let menuKey = MenuKey(rawValue: id) else { return .none }
                 
                 switch menuKey {
-                case .pen:
-                    break
-                case .laserPointer:
-                    break
+                case .openMenu:
+                    return .run { send in
+                        await send(.deactivateHotKey)
+                        await send(.openMenu)
+                    }
                 }
                 
                 return .none
@@ -59,8 +68,13 @@ public struct Menu: Reducer {
             case .hotKey:
                 return .none
                 
-            case .start:
-                return .run { send in
+            case .openMenu:
+                state.openMenuSignal.fire()
+                return .none
+                
+            case .setup:
+                return .run { [entries = state.hotKeyEntries] send in
+                    await send(.hotKey(.register(entries)))
                 }
                 
             case .delegate:

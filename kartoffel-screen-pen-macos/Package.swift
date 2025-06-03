@@ -68,6 +68,7 @@ let package = Package(
         .target(
             name: "MenuFeature",
             dependencies: [
+                "Common",
                 "HotKeyFeature",
                 "StyleGuide",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture")

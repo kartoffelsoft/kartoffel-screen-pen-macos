@@ -13,7 +13,7 @@ public class GlassBoardWindow: NSWindow {
                    backing: backing,
                    defer: flag)
         
-        self.level = .popUpMenu
+        self.level = .screenSaver
         self.isOpaque = false
         self.backgroundColor = .clear
         self.ignoresMouseEvents = false
