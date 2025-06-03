@@ -31,8 +31,6 @@ public class AppRootController {
             action: AppRoot.Action.menu
         ))
         
-        self.menuController.load()
-        
         setupBindings()
     }
     
@@ -64,7 +62,7 @@ public class AppRootController {
 
             data.forEach { id in
                 let controller = GlassBoardWindowController(id: id)
-                
+
                 controller.contentViewController = IfLetStoreController(store: self.store.scope(
                     state: { $0.glassBoards[id: id] },
                     action: { .glassBoards(id: id, action: $0) }

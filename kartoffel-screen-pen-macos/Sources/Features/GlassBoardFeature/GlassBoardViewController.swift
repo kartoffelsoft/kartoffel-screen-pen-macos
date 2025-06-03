@@ -95,7 +95,7 @@ public class GlassBoardViewController: NSViewController {
             guard let self = self else { return }
             guard let view = self.view as? GlassBoardView else { return }
             
-            switch(tool) {
+            switch tool {
             case .pen:
                 let image = NSImage.theme.appIcon
                 image.size = NSSize(width: 20, height: 20)

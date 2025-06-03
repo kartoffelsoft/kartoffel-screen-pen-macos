@@ -4,19 +4,21 @@ import Foundation
 public struct HotKey: Reducer {
 
     public struct State: Equatable {
+
+        var entries: IdentifiedArrayOf<HotKeyEntry>
         
-        public init() {}
+        public init(entries: [HotKeyEntry]) {
+            self.entries = IdentifiedArrayOf(uniqueElements: entries)
+        }
     }
     
     public enum Action {
-        
-        case register
-        
+
         case delegate(DelegateAction)
         
         public enum DelegateAction: Equatable {
             
-            case hotKeyDown
+            case hotKeyDown(UInt32)
         }
     }
 
@@ -25,9 +27,7 @@ public struct HotKey: Reducer {
     public var body: some Reducer<State, Action> {
         Reduce { state, action in
             switch action {
-            case .register:
-                return .none
-                
+
             case .delegate:
                 return .none
             }

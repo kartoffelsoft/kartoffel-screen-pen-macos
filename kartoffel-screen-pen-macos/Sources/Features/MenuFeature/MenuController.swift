@@ -24,10 +24,12 @@ public class MenuController: NSObject {
         ))
         
         super.init()
+        
+        setupMenu()
         setupBindings()
     }
     
-    public func load() {
+    private func setupMenu() {
         let mainMenu = NSMenu()
         mainMenu.delegate = self
 
