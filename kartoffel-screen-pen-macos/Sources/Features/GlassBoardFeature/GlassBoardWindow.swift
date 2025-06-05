@@ -16,7 +16,7 @@ public class GlassBoardWindow: NSWindow {
         self.level = .screenSaver
         self.isOpaque = false
         self.backgroundColor = .clear
-        self.ignoresMouseEvents = false
+        self.ignoresMouseEvents = true
     }
     
     public override var canBecomeKey: Bool { true }

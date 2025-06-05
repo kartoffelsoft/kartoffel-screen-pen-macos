@@ -43,11 +43,10 @@ public struct AppRoot: Reducer {
                     state.showGlassBoards.append(id)
                 }
 
-                return .run { send in
-                    await send(.localEventMonitor(.activate))
-                }
+                return .none
                 
             case .appRootDelegate(.delegate(.start)):
+                state.createGlassBoardsSignal.fire()
                 return .run { send in
                     await send(.menu(.setup))
                 }
@@ -66,7 +65,6 @@ public struct AppRoot: Reducer {
             case .glassBoards:
                 return .none
 
-                
             case .localEventMonitor(.delegate(.mouseLocation(let location))):
                 for board in state.glassBoards {
                     if board.frame.contains(location) {
@@ -80,12 +78,10 @@ public struct AppRoot: Reducer {
                 
             case .menu(.delegate(.selectPen)):
                 state.drawingTool = .pen(color: .white)
-                state.createGlassBoardsSignal.fire()
                 return .none
                 
             case .menu(.delegate(.selectLaserPointer)):
                 state.drawingTool = .laserPointer
-                state.createGlassBoardsSignal.fire()
                 return .none
                 
             case .menu:
