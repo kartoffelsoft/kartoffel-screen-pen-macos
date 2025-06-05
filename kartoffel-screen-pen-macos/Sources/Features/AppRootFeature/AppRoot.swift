@@ -1,8 +1,8 @@
 import Common
 import ComposableArchitecture
+import EventTapFeature
 import Foundation
 import GlassBoardFeature
-import LocalEventMonitorFeature
 import MenuFeature
 
 public struct AppRoot: Reducer {
@@ -12,8 +12,8 @@ public struct AppRoot: Reducer {
         var activeBoardId: UUID?
         var appRootDelegate: AppRootDelegate.State = .init()
         var createGlassBoardsSignal: Signal = .init()
+        var eventTap: EventTap.State = .init()
         var glassBoards: IdentifiedArrayOf<GlassBoard.State> = []
-        var localEventMonitor: LocalEventMonitor.State = .init()
         var menu: Menu.State = .init()
         var showGlassBoards: [UUID] = []
         var drawingTool: DrawingTool = .none
@@ -26,8 +26,8 @@ public struct AppRoot: Reducer {
         case createGlassBoards([NSRect])
         
         case appRootDelegate(AppRootDelegate.Action)
+        case eventTap(EventTap.Action)
         case glassBoards(id: GlassBoard.State.ID, action: GlassBoard.Action)
-        case localEventMonitor(LocalEventMonitor.Action)
         case menu(Menu.Action)
     }
 
@@ -54,26 +54,16 @@ public struct AppRoot: Reducer {
             case .appRootDelegate:
                 return .none
                 
+            case .eventTap:
+                return .none
+                
             case let .glassBoards(id: id, action: .delegate(.dismiss)):
                 state.glassBoards.removeAll()
                 state.showGlassBoards.removeAll()
                 state.drawingTool = .none
-                return .run { send in
-                    await send(.localEventMonitor(.deactivate))
-                }
+                return .none
                 
             case .glassBoards:
-                return .none
-
-            case .localEventMonitor(.delegate(.mouseLocation(let location))):
-                for board in state.glassBoards {
-                    if board.frame.contains(location) {
-                        state.activeBoardId = board.id
-                    }
-                }
-                return .none
-                
-            case .localEventMonitor:
                 return .none
                 
             case .menu(.delegate(.selectPen)):
@@ -91,11 +81,11 @@ public struct AppRoot: Reducer {
         Scope(state: \.appRootDelegate, action: /Action.appRootDelegate) {
             AppRootDelegate()
         }
+        Scope(state: \.eventTap, action: /Action.eventTap) {
+            EventTap()
+        }
         Scope(state: \.menu, action: /Action.menu) {
             Menu()
-        }
-        Scope(state: \.localEventMonitor, action: /Action.localEventMonitor) {
-            LocalEventMonitor()
         }
         .forEach(\.glassBoards, action: /Action.glassBoards) {
             GlassBoard()

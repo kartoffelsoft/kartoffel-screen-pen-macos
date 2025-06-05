@@ -2,8 +2,8 @@ import AppKit
 import AppKitUtils
 import Combine
 import ComposableArchitecture
+import EventTapFeature
 import GlassBoardFeature
-import LocalEventMonitorFeature
 import MenuFeature
 
 public class AppRootController {
@@ -13,7 +13,8 @@ public class AppRootController {
     private var cancellables: Set<AnyCancellable> = []
     
     private var glassBoardWindowControllers: IdentifiedArrayOf<GlassBoardWindowController> = []
-    private let localEventMonitorController: LocalEventMonitorController
+    
+    private let eventTapController: EventTapController
     private let menuController: MenuController
 
     @MainActor
@@ -21,9 +22,9 @@ public class AppRootController {
         self.store = store
         self.viewStore = ViewStore(store, observe: { $0 })
         
-        self.localEventMonitorController = .init(store: self.store.scope(
-            state: \.localEventMonitor,
-            action: AppRoot.Action.localEventMonitor
+        self.eventTapController = .init(store: self.store.scope(
+            state: \.eventTap,
+            action: AppRoot.Action.eventTap
         ))
         
         self.menuController = .init(store: self.store.scope(

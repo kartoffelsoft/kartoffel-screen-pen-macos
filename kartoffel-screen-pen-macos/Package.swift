@@ -33,13 +33,20 @@ let package = Package(
             dependencies: [
                 "AppKitUtils",
                 "Common",
+                "EventTapFeature",
                 "GlassBoardFeature",
-                "LocalEventMonitorFeature",
                 "MenuFeature",
                 "StyleGuide",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
             ],
             path: "./Sources/Features/AppRootFeature"
+        ),
+        .target(
+            name: "EventTapFeature",
+            dependencies: [
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+            ],
+            path: "./Sources/Features/EventTapFeature"
         ),
         .target(
             name: "GlassBoardFeature",
@@ -57,13 +64,6 @@ let package = Package(
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
             ],
             path: "./Sources/Features/HotKeyFeature"
-        ),
-        .target(
-            name: "LocalEventMonitorFeature",
-            dependencies: [
-                .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
-            ],
-            path: "./Sources/Features/LocalEventMonitorFeature"
         ),
         .target(
             name: "MenuFeature",

@@ -1,7 +1,7 @@
 import ComposableArchitecture
 import Foundation
 
-public struct LocalEventMonitor: Reducer {
+public struct EventTap: Reducer {
 
     public struct State: Equatable {
         
@@ -19,7 +19,7 @@ public struct LocalEventMonitor: Reducer {
         
         public enum DelegateAction: Equatable {
             
-            case mouseLocation(NSPoint)
+            case event
         }
     }
 
