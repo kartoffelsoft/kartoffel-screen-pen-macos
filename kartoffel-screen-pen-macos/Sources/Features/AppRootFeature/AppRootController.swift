@@ -33,6 +33,17 @@ public class AppRootController {
         ))
         
         setupBindings()
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(didChangeScreenParameters),
+            name: NSApplication.didChangeScreenParametersNotification,
+            object: nil
+        )
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
     
     @MainActor
@@ -78,5 +89,12 @@ public class AppRootController {
             }
         }
         .store(in: &self.cancellables)
+    }
+    
+    @objc func didChangeScreenParameters(_ notification: Notification) {
+        for screen in NSScreen.screens {
+            if let screenID = screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? CGDirectDisplayID {
+            }
+        }
     }
 }

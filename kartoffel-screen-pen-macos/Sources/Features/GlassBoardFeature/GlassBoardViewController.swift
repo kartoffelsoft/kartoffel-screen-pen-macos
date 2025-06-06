@@ -41,7 +41,6 @@ public class GlassBoardViewController: NSViewController {
 
     public override func viewWillAppear() {
         super.viewWillAppear()
-        
         self.view.setFrameOrigin(.zero)
         self.view.setFrameSize(viewStore.frame.size)
         self.view.window?.setFrame(viewStore.frame, display: true)
@@ -58,12 +57,6 @@ public class GlassBoardViewController: NSViewController {
     
     public override func loadView() {
         self.view = GlassBoardView(frame: .zero, device: MTLCreateSystemDefaultDevice())
-    }
-    
-    public override func keyDown(with event: NSEvent) {
-        if event.keyCode == 53 && event.type == .keyDown {
-            viewStore.send(.dismiss)
-        }
     }
     
     public override func mouseDown(with event: NSEvent) {
@@ -91,6 +84,14 @@ public class GlassBoardViewController: NSViewController {
     }
     
     private func setupBindings() {
+        viewStore.publisher.frame.sink { [weak self] frame in
+            guard let self = self else { return }
+            self.view.setFrameOrigin(.zero)
+            self.view.setFrameSize(frame.size)
+            self.view.window?.setFrame(frame, display: true)
+        }
+        .store(in: &self.cancellables)
+        
         viewStore.publisher.currentDrawingTool.sink { [weak self] tool in
             guard let self = self else { return }
             guard let view = self.view as? GlassBoardView else { return }

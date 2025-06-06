@@ -49,19 +49,42 @@ public struct AppRoot: Reducer {
                 state.createGlassBoardsSignal.fire()
                 return .run { send in
                     await send(.menu(.setup))
-                    await send(.eventTap(.activate))
                 }
                 
             case .appRootDelegate:
                 return .none
                 
-            case .eventTap:
+            case .eventTap(.delegate(.escKeyDown)):
+                state.drawingTool = .none
+                return .run { send in
+                    await send(.eventTap(.deactivate))
+                }
+                
+            case let .eventTap(.delegate(.leftMouseDown(location))):
+                if let board = state.glassBoards.first(where: { $0.frame.contains(location) }) {
+                    return .run { [id = board.id] send in
+                        await send(.glassBoards(id: id, action: .beginDraw(location)))
+                    }
+                }
                 return .none
                 
-            case let .glassBoards(id: id, action: .delegate(.dismiss)):
-                state.glassBoards.removeAll()
-                state.showGlassBoards.removeAll()
-                state.drawingTool = .none
+            case let .eventTap(.delegate(.leftMouseDragged(location))):
+                if let board = state.glassBoards.first(where: { $0.frame.contains(location) }) {
+                    return .run { [id = board.id] send in
+                        await send(.glassBoards(id: id, action: .continueDraw(location)))
+                    }
+                }
+                return .none
+
+            case let .eventTap(.delegate(.leftMouseUp(location))):
+                if let board = state.glassBoards.first(where: { $0.frame.contains(location) }) {
+                    return .run { [id = board.id] send in
+                        await send(.glassBoards(id: id, action: .endDraw(location)))
+                    }
+                }
+                return .none
+                
+            case .eventTap:
                 return .none
                 
             case .glassBoards:
@@ -69,11 +92,15 @@ public struct AppRoot: Reducer {
                 
             case .menu(.delegate(.selectPen)):
                 state.drawingTool = .pen(color: .white)
-                return .none
+                return .run { send in
+                    await send(.eventTap(.activate))
+                }
                 
             case .menu(.delegate(.selectLaserPointer)):
                 state.drawingTool = .laserPointer
-                return .none
+                return .run { send in
+                    await send(.eventTap(.activate))
+                }
                 
             case .menu:
                 return .none

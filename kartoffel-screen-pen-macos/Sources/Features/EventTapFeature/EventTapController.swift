@@ -12,6 +12,19 @@ public class EventTapController {
     private var eventTap: CFMachPort?
     private var runLoopSource: CFRunLoopSource?
 
+    private var eventsOfInterests: CGEventMask = {
+        var mask: CGEventMask = 0
+        mask |= (1 << CGEventType.keyDown.rawValue)
+        mask |= (1 << CGEventType.keyUp.rawValue)
+        mask |= (1 << CGEventType.leftMouseDown.rawValue)
+        mask |= (1 << CGEventType.leftMouseDragged.rawValue)
+        mask |= (1 << CGEventType.leftMouseUp.rawValue)
+        mask |= (1 << CGEventType.rightMouseDown.rawValue)
+        mask |= (1 << CGEventType.rightMouseDragged.rawValue)
+        mask |= (1 << CGEventType.rightMouseUp.rawValue)
+        return mask
+    }()
+    
     public init(store: StoreOf<EventTap>) {
         self.store = store
         self.viewStore = ViewStore(store, observe: { $0 })
@@ -30,10 +43,7 @@ public class EventTapController {
                     tap: .cgSessionEventTap,
                     place: .headInsertEventTap,
                     options: .defaultTap,
-                    eventsOfInterest:
-                        CGEventMask(1 << CGEventType.mouseMoved.rawValue) |
-                        CGEventMask(1 << CGEventType.leftMouseDown.rawValue) |
-                        CGEventMask(1 << CGEventType.leftMouseUp.rawValue),
+                    eventsOfInterest: self.eventsOfInterests,
                     callback: Self.eventTapCallBack,
                     userInfo: UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque()),
                 )
@@ -65,20 +75,31 @@ public class EventTapController {
         let weakSelf = Unmanaged<EventTapController>.fromOpaque(userInfo).takeUnretainedValue()
         
         switch type {
+        case .keyDown:
+            if event.getIntegerValueField(.keyboardEventKeycode) == 53 {
+                weakSelf.viewStore.send(.delegate(.escKeyDown))
+            }
+            return nil
+            
         case .leftMouseDown:
             weakSelf.viewStore.send(.delegate(.leftMouseDown(event.location)))
-            break
+            return nil
+            
+        case .leftMouseDragged:
+            weakSelf.viewStore.send(.delegate(.leftMouseDragged(event.location)))
+            return nil
+            
         case .leftMouseUp:
             weakSelf.viewStore.send(.delegate(.leftMouseUp(event.location)))
-            break
-        case .mouseMoved:
-            weakSelf.viewStore.send(.delegate(.mouseMoved(event.location)))
-            break
+            return nil
+
+        case .keyUp: fallthrough
+        case .rightMouseDown: fallthrough
+        case .rightMouseDragged: fallthrough
+        case .rightMouseUp: return nil
+            
         default:
             break
-        }
-        if type == .mouseMoved {
-            print("Mouse moved to: \(event.location.x), \(event.location.y)")
         }
         
         return Unmanaged.passRetained(event)
