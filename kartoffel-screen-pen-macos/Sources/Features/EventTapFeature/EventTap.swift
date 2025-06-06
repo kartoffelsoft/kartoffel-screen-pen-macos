@@ -18,8 +18,10 @@ public struct EventTap: Reducer {
         case delegate(DelegateAction)
         
         public enum DelegateAction: Equatable {
-            
-            case event
+
+            case leftMouseDown(CGPoint)
+            case leftMouseUp(CGPoint)
+            case mouseMoved(CGPoint)
         }
     }
 

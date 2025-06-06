@@ -49,6 +49,7 @@ public struct AppRoot: Reducer {
                 state.createGlassBoardsSignal.fire()
                 return .run { send in
                     await send(.menu(.setup))
+                    await send(.eventTap(.activate))
                 }
                 
             case .appRootDelegate:
