@@ -3,9 +3,9 @@ import ComposableArchitecture
 
 public class GlassBoardWindowController: NSWindowController, Identifiable {
     
-    public let id: UUID
+    public let id: UInt32
 
-    public init(id: UUID) {
+    public init(id: UInt32) {
         self.id = id
         super.init(window: GlassBoardWindow())
     }

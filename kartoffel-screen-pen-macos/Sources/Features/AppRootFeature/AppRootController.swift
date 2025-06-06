@@ -47,32 +47,30 @@ public class AppRootController {
     }
     
     @MainActor
-    private func setupBindings() {
-        viewStore.publisher.activeBoardId.sink { [weak self] id in
-            guard let self = self else { return }
-            guard let id = id else { return }
-            glassBoardWindowControllers[id: id]?.window?.makeKeyAndOrderFront(nil)
-        }
-        .store(in: &self.cancellables)
-        
-        viewStore.publisher.createGlassBoardsSignal.sink { [weak self] signal in
+    private func setupBindings() {        
+        viewStore.publisher.fetchScreensSignal.sink { [weak self] signal in
             guard signal.isValid else { return }
             guard let self = self else { return }
-            self.viewStore.send(.createGlassBoards(NSScreen.screens.map{$0.frame}))
+            self.fetchScreens()
         }
         .store(in: &self.cancellables)
         
-        viewStore.publisher.showGlassBoards.sink { [weak self] data in
+        viewStore.publisher.showGlassBoards.sink { [weak self] ids in
             guard let self = self else { return }
-            guard data.count > 0 else {
+            guard ids.count > 0 else {
                 self.glassBoardWindowControllers.forEach { $0.window?.close() }
                 self.glassBoardWindowControllers.removeAll()
                 return
             }
-            
-            NSApp.activate(ignoringOtherApps: true)
 
-            data.forEach { id in
+            for id in glassBoardWindowControllers.map(\.id) where !ids.contains(id) {
+                glassBoardWindowControllers[id: id]?.window?.close()
+                glassBoardWindowControllers.remove(id: id)
+            }
+            
+            ids.forEach { id in
+                guard glassBoardWindowControllers[id: id] == nil else { return }
+                
                 let controller = GlassBoardWindowController(id: id)
 
                 controller.contentViewController = IfLetStoreController(store: self.store.scope(
@@ -91,10 +89,20 @@ public class AppRootController {
         .store(in: &self.cancellables)
     }
     
-    @objc func didChangeScreenParameters(_ notification: Notification) {
-        for screen in NSScreen.screens {
-            if let screenID = screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? CGDirectDisplayID {
+    @MainActor
+    private func fetchScreens() {
+        let screens: [(UInt32, NSRect)] = NSScreen.screens.compactMap { screen in
+            guard let id = screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? UInt32 else {
+                return nil
             }
+            return (id, screen.frame)
         }
+        
+        self.viewStore.send(.updateGlassBoards(screens))
+    }
+    
+    @MainActor
+    @objc func didChangeScreenParameters(_ notification: Notification) {
+        fetchScreens()
     }
 }

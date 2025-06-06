@@ -9,13 +9,12 @@ public struct AppRoot: Reducer {
 
     public struct State: Equatable {
 
-        var activeBoardId: UUID?
         var appRootDelegate: AppRootDelegate.State = .init()
-        var createGlassBoardsSignal: Signal = .init()
         var eventTap: EventTap.State = .init()
+        var fetchScreensSignal: Signal = .init()
         var glassBoards: IdentifiedArrayOf<GlassBoard.State> = []
         var menu: Menu.State = .init()
-        var showGlassBoards: [UUID] = []
+        var showGlassBoards: [UInt32] = []
         var drawingTool: DrawingTool = .none
         
         public init() {}
@@ -23,7 +22,7 @@ public struct AppRoot: Reducer {
     
     public enum Action {
         
-        case createGlassBoards([NSRect])
+        case updateGlassBoards([(UInt32, NSRect)])
         
         case appRootDelegate(AppRootDelegate.Action)
         case eventTap(EventTap.Action)
@@ -36,17 +35,30 @@ public struct AppRoot: Reducer {
     public var body: some Reducer<State, Action> {
         Reduce { state, action in
             switch action {
-            case let .createGlassBoards(screenFrames):
-                for frame in screenFrames {
-                    let id = UUID()
-                    state.glassBoards.append(.init(id: id, frame: frame))
-                    state.showGlassBoards.append(id)
-                }
+            case let .updateGlassBoards(screens):
+                var updates: [(UInt32, CGRect)] = []
+                
+                let ids = Set(screens.map { $0.0 })
+                state.glassBoards = state.glassBoards.filter { ids.contains($0.id) }
+                state.showGlassBoards = []
 
-                return .none
+                for screen in screens {
+                    if let _ = state.glassBoards[id: screen.0] {
+                        updates.append(screen)
+                    } else {
+                        state.glassBoards.append(.init(id: screen.0, frame: screen.1))
+                    }
+                    state.showGlassBoards.append(screen.0)
+                }
+                
+                return .run { [updates = updates] send in
+                    for update in updates {
+                        await send(.glassBoards(id: update.0, action: .updateFrame(update.1)))
+                    }
+                }
                 
             case .appRootDelegate(.delegate(.start)):
-                state.createGlassBoardsSignal.fire()
+                state.fetchScreensSignal.fire()
                 return .run { send in
                     await send(.menu(.setup))
                 }

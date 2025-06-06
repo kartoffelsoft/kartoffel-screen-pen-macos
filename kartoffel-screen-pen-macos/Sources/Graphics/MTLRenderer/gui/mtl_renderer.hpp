@@ -38,6 +38,7 @@ private:
     
     CA::MetalDrawable *_target_drawable;
     MTL::Texture *_target_texture;
+    gui::layout::size_t _display_size;
     gui::layout::vec2_t _display_scale;
     MTL::CommandBuffer *_command_buffer;
     MTL::RenderCommandEncoder *_encoder;

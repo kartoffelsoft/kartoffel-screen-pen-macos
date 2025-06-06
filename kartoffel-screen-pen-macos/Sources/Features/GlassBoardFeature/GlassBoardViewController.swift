@@ -167,7 +167,7 @@ extension GlassBoardViewController: MTKViewDelegate {
 
     public func draw(in view: MTKView) {
         guard let currentDrawable = mtkView.currentDrawable else { return }
-        
+
         renderer.beginDraw(
             onDrawable: currentDrawable,
             width: view.bounds.size.width,

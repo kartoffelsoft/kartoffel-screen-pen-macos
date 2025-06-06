@@ -6,12 +6,12 @@ public struct GlassBoard: Reducer {
     
     public struct State: Equatable, Identifiable {
         
-        public let id: UUID
-        public let frame: NSRect
+        public let id: UInt32
+        public var frame: NSRect
         public var currentDrawingTool: DrawingTool = .laserPointer
         public var drawings: [DrawingData] = []
         
-        public init(id: UUID, frame: NSRect) {
+        public init(id: UInt32, frame: NSRect) {
             self.id = id
             self.frame = frame
         }
@@ -23,6 +23,7 @@ public struct GlassBoard: Reducer {
         case continueDraw(CGPoint)
         case dismiss
         case endDraw(CGPoint)
+        case updateFrame(CGRect)
         
         case delegate(DelegateAction)
         
@@ -59,6 +60,11 @@ public struct GlassBoard: Reducer {
             case let .endDraw(point):
                 guard let lastIndex = state.drawings.indices.last else { return .none}
                 state.drawings[lastIndex].add(point: point)
+                return .none
+                
+            case let .updateFrame(frame):
+                state.frame = frame
+                state.drawings = []
                 return .none
             
             case .delegate:

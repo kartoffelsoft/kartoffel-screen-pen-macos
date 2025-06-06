@@ -46,6 +46,7 @@ void mtl_renderer_t::begin_draw(const gui::context_t &ctx)
             break;
     }
     
+    _display_size = ctx.display_size;
     _display_scale = ctx.display_scale;
     
     _command_buffer = _command_queue->commandBuffer();
@@ -123,12 +124,17 @@ void mtl_renderer_t::end_draw()
 
     for(const gui::command_t &command : builder.commands)
     {
+        float x = fmin(command.clip_rect.origin.x, _display_size.width);
+        float y = fmin(command.clip_rect.origin.y, _display_size.height);
+        float width = fmin(command.clip_rect.size.width, _display_size.width > x ? _display_size.width - x : 0);
+        float height = fmin(command.clip_rect.size.height, _display_size.height > y ? _display_size.height - y : 0);
+        
         MTL::ScissorRect scissorRect =
         {
-            .x = (NS::UInteger)(command.clip_rect.origin.x * _display_scale.x),
-            .y = (NS::UInteger)(command.clip_rect.origin.y * _display_scale.y),
-            .width = (NS::UInteger)(command.clip_rect.size.width * _display_scale.x),
-            .height = (NS::UInteger)(command.clip_rect.size.height * _display_scale.y)
+            .x = (NS::UInteger)(x * _display_scale.x),
+            .y = (NS::UInteger)(y * _display_scale.y),
+            .width = (NS::UInteger)(width * _display_scale.x),
+            .height = (NS::UInteger)(height * _display_scale.y)
         };
         _encoder->setScissorRect(scissorRect);
 
