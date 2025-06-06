@@ -34,8 +34,7 @@ public class GlassBoardViewController: NSViewController {
 
         mtkView.delegate = self
         mtkView.enableSetNeedsDisplay = true
-        
-        setupConstraints()
+
         setupBindings()
     }
 
@@ -58,31 +57,7 @@ public class GlassBoardViewController: NSViewController {
     public override func loadView() {
         self.view = GlassBoardView(frame: .zero, device: MTLCreateSystemDefaultDevice())
     }
-    
-    public override func mouseDown(with event: NSEvent) {
-        viewStore.send(.beginDraw(.init(
-            x: event.locationInWindow.x,
-            y: self.view.frame.size.height - event.locationInWindow.y
-        )))
-    }
-    
-    public override func mouseUp(with event: NSEvent) {
-        viewStore.send(.endDraw(.init(
-            x: event.locationInWindow.x,
-            y: self.view.frame.size.height - event.locationInWindow.y
-        )))
-    }
 
-    public override func mouseDragged(with event: NSEvent) {
-        viewStore.send(.continueDraw(.init(
-            x: event.locationInWindow.x,
-            y: self.view.frame.size.height - event.locationInWindow.y
-        )))
-    }
-    
-    private func setupConstraints() {
-    }
-    
     private func setupBindings() {
         viewStore.publisher.frame.sink { [weak self] frame in
             guard let self = self else { return }
