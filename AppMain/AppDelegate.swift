@@ -15,8 +15,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private var controller: AppRootController?
     
     func applicationDidFinishLaunching(_ aNotification: Notification) {
+        let axCheckOptions: NSDictionary = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String : true]
+        
         controller = AppRootController(store: store)
-        viewStore.send(.appRootDelegate(.didFinishLaunching))
+        viewStore.send(.appRootDelegate(.didFinishLaunching(axCheckOptions)))
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {

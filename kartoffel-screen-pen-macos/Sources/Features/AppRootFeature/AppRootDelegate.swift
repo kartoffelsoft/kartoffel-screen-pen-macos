@@ -1,12 +1,17 @@
+import ApplicationServices
 import ComposableArchitecture
+import Foundation
 
 public struct AppRootDelegate: Reducer {
     
-    public struct State: Equatable {}
+    public struct State: Equatable {
+        
+        var axTrustedCheckOptions: NSDictionary = [:]
+    }
     
     public enum Action {
         
-        case didFinishLaunching
+        case didFinishLaunching(NSDictionary)
         
         case delegate(DelegateAction)
         
@@ -21,7 +26,10 @@ public struct AppRootDelegate: Reducer {
     public var body: some Reducer<State, Action> {
         Reduce { state, action in
             switch action {
-            case .didFinishLaunching:
+            case let .didFinishLaunching(axTrustedCheckOptions):
+                state.axTrustedCheckOptions = axTrustedCheckOptions
+                AXIsProcessTrustedWithOptions(axTrustedCheckOptions)
+                
                 return .run { send in
                     await send(.delegate(.start))
                 }
