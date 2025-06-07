@@ -67,34 +67,6 @@ public class GlassBoardViewController: NSViewController {
         }
         .store(in: &self.cancellables)
         
-        viewStore.publisher.currentDrawingTool.sink { [weak self] tool in
-            guard let self = self else { return }
-            guard let view = self.view as? GlassBoardView else { return }
-            
-            switch tool {
-            case .pen:
-                let image = NSImage.theme.appIcon
-                image.size = NSSize(width: 20, height: 20)
-                view.cursor = NSCursor(image: image, hotSpot: NSPoint(x: 10, y: 10))
-                view.resetCursorRects()
-                break
-                
-            case .laserPointer:
-                let image = NSImage.theme.laserPointerCursor
-                image.size = NSSize(width: 20, height: 20)
-                view.cursor = NSCursor(image: image, hotSpot: NSPoint(x: 10, y: 10))
-                view.resetCursorRects()
-                break
-                
-            case .eraser:
-                break
-                
-            case .none:
-                break
-            }
-        }
-        .store(in: &self.cancellables)
-        
         viewStore.publisher.drawings.sink { [weak self] drawings in
             guard let self = self else { return }
             guard let canvas = self.canvas else { return }
