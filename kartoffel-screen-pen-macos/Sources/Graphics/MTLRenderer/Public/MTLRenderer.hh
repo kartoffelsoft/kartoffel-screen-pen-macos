@@ -9,16 +9,18 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithDevice:(nullable id<MTLDevice>)device;
 
 - (void)beginDrawOnDrawable:(id<CAMetalDrawable>)drawable
+                 loadAction:(MTLLoadAction)loadAction
                       width:(CGFloat)width
                      height:(CGFloat)height
                       scale:(CGFloat)scale
-  NS_SWIFT_NAME(beginDraw(onDrawable:width:height:scale:));
+  NS_SWIFT_NAME(beginDraw(onDrawable:loadAction:width:height:scale:));
 
 - (void)beginDrawOnTexture:(id<MTLTexture>)handle
+                loadAction:(MTLLoadAction)loadAction
                      width:(CGFloat)width
                     height:(CGFloat)height
                      scale:(CGFloat)scale
-  NS_SWIFT_NAME(beginDraw(onTexture:width:height:scale:));
+  NS_SWIFT_NAME(beginDraw(onTexture:loadAction:width:height:scale:));
 
 - (void)endDraw;
 

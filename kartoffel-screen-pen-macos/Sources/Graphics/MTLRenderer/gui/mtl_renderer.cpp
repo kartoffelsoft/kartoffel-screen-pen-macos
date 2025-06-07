@@ -53,9 +53,9 @@ void mtl_renderer_t::begin_draw(const gui::context_t &ctx)
     MTL::RenderPassDescriptor *desc = MTL::RenderPassDescriptor::alloc()->init();
 
     desc->colorAttachments()->object(0)->setTexture(_target_texture);
-    desc->colorAttachments()->object(0)->setLoadAction(MTL::LoadActionClear);
     desc->colorAttachments()->object(0)->setClearColor(MTL::ClearColor::Make(0.0f, 0.0f, 0.0f, 0.0f));
-    
+    desc->colorAttachments()->object(0)->setLoadAction(static_cast<MTL::LoadAction>(ctx.load_action));
+
     _encoder = _command_buffer->renderCommandEncoder(desc);
     desc->release();
     
@@ -103,6 +103,14 @@ void mtl_renderer_t::end_draw()
     {
         _encoder->popDebugGroup();
         _encoder->endEncoding();
+        
+        if(_target_drawable)
+        {
+            _command_buffer->presentDrawable(_target_drawable);
+        }
+
+        _command_buffer->commit();
+        builder.reset();
         return;
     }
     
@@ -169,6 +177,7 @@ void mtl_renderer_t::end_draw()
     }
 
     _command_buffer->commit();
+    builder.reset();
 }
 
 void mtl_renderer_t::setup_depth_stencil()

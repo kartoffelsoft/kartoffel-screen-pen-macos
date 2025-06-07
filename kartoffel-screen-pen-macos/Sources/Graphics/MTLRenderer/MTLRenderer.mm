@@ -1,5 +1,6 @@
 #import "MTLRenderer.hh"
 
+#import "gui/asset/texture_id.hpp"
 #import "gui/layout/vec.hpp"
 #import "gui/mtl_renderer.hpp"
 
@@ -19,6 +20,7 @@
 }
 
 - (void)beginDrawOnDrawable:(id<CAMetalDrawable>)drawable
+                 loadAction:(MTLLoadAction)loadAction
                       width:(CGFloat)width
                      height:(CGFloat)height
                       scale:(CGFloat)scale {
@@ -26,6 +28,7 @@
     
     context.type = gui::context_type_display;
     context.handle = (gui::context_handle_t)(__bridge CA::MetalDrawable *)drawable;
+    context.load_action = (gui::context_load_action_t)loadAction;
     
     context.display_size = gui::layout::size_t{(float)width, (float)height};
     context.display_scale = gui::layout::vec2_t{(float)scale, (float)scale};
@@ -34,6 +37,7 @@
 }
 
 - (void)beginDrawOnTexture:(id<MTLTexture>)texture
+                loadAction:(MTLLoadAction)loadAction
                      width:(CGFloat)width
                     height:(CGFloat)height
                      scale:(CGFloat)scale {
@@ -41,6 +45,7 @@
     
     context.type = gui::context_type_texture;
     context.handle = (gui::context_handle_t)(__bridge MTL::Texture *)texture;
+    context.load_action = (gui::context_load_action_t)loadAction;
     
     context.display_size = gui::layout::size_t{(float)width, (float)height};
     context.display_scale = gui::layout::vec2_t{(float)scale, (float)scale};
@@ -73,7 +78,10 @@
                     p1:(CGPoint)p1
                     p2:(CGPoint)p2
                  color:(NSColor *)color {
-    
+    _renderer->builder.add_texture((gui::asset::texture_id_t)(__bridge void *)texture,
+                                   {(float)p1.x, (float)p1.y},
+                                   {(float)p2.x, (float)p2.y},
+                                   {0xFF, 0xFF, 0xFF, 0xFF});
 }
 
 - (void)pushClipRect:(CGRect)rect {

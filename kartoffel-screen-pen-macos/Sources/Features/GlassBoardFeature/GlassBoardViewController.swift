@@ -98,6 +98,20 @@ public class GlassBoardViewController: NSViewController {
         viewStore.publisher.drawings.sink { [weak self] drawings in
             guard let self = self else { return }
             guard let canvas = self.canvas else { return }
+            
+            guard !drawings.isEmpty else {
+                renderer.beginDraw(
+                    onTexture: canvas,
+                    loadAction: MTLLoadAction.clear,
+                    width: view.bounds.width,
+                    height: view.bounds.height,
+                    scale: self.view.window?.screen?.backingScaleFactor ?? NSScreen.main?.backingScaleFactor ?? 1.0
+                )
+                renderer.endDraw()
+                self.mtkView.needsDisplay = true
+                return
+            }
+            
             guard let drawing = drawings.last else { return }
             
             let path = Array(drawing.path.suffix(9))
@@ -105,6 +119,7 @@ public class GlassBoardViewController: NSViewController {
             
             renderer.beginDraw(
                 onTexture: canvas,
+                loadAction: MTLLoadAction.load,
                 width: view.bounds.width,
                 height: view.bounds.height,
                 scale: self.view.window?.screen?.backingScaleFactor ?? NSScreen.main?.backingScaleFactor ?? 1.0
@@ -167,14 +182,32 @@ extension GlassBoardViewController: MTKViewDelegate {
 
     public func draw(in view: MTKView) {
         guard let currentDrawable = mtkView.currentDrawable else { return }
-
+        guard let canvas = canvas else { return }
+        
         renderer.beginDraw(
             onDrawable: currentDrawable,
+            loadAction: MTLLoadAction.clear,
             width: view.bounds.size.width,
             height: view.bounds.size.height,
             scale: view.window?.screen?.backingScaleFactor ?? NSScreen.main?.backingScaleFactor ?? 1.0
         )
 
+        self.renderer.pushClipRect(.init(
+            x: 0,
+            y: 0,
+            width: view.bounds.width,
+            height: view.bounds.height,
+        ))
+        
+        self.renderer.addTexture(
+            with: canvas,
+            p1: .init(x: 0, y: 0),
+            p2: .init(x: view.bounds.width, y: view.bounds.height),
+            color: .white
+        )
+        
+        self.renderer.popClipRect()
+        
         renderer.endDraw()
     }
 }

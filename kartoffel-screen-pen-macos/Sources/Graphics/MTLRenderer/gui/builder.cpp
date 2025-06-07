@@ -130,7 +130,9 @@ const gui::layout::rect_t & builder_t::get_clip_rect_top() const
 void builder_t::reset()
 {
     commands.clear();
+    indices.clear();
     vertices.clear();
+    
     _clip_rect_stack.clear();
 }
 

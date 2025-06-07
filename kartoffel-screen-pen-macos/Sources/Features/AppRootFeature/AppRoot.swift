@@ -68,8 +68,11 @@ public struct AppRoot: Reducer {
                 
             case .eventTap(.delegate(.escKeyDown)):
                 state.drawingTool = .none
-                return .run { send in
+                return .run { [boardIds = state.glassBoards.map{$0.id}] send in
                     await send(.eventTap(.deactivate))
+                    for id in boardIds {
+                        await send(.glassBoards(id: id, action: .clear))
+                    }
                 }
                 
             case let .eventTap(.delegate(.leftMouseDown(location))):

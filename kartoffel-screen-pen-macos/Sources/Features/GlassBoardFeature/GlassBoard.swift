@@ -20,6 +20,7 @@ public struct GlassBoard: Reducer {
     public enum Action {
         
         case beginDraw(CGPoint)
+        case clear
         case continueDraw(CGPoint)
         case dismiss
         case endDraw(CGPoint)
@@ -45,6 +46,10 @@ public struct GlassBoard: Reducer {
                 guard let lastIndex = state.drawings.indices.last else { return .none}
                 state.drawings[lastIndex].drawingTool = state.currentDrawingTool
                 state.drawings[lastIndex].add(point: point)
+                return .none
+                
+            case .clear:
+                state.drawings = []
                 return .none
                 
             case let .continueDraw(point):
