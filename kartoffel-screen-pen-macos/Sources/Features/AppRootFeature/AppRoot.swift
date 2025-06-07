@@ -75,6 +75,9 @@ public struct AppRoot: Reducer {
                     }
                 }
                 
+            case let .eventTap(.delegate(.mouseMoved(location))):
+                return .none
+                
             case let .eventTap(.delegate(.leftMouseDown(location))):
                 if let board = state.glassBoards.first(where: { $0.frame.contains(location) }) {
                     return .run { [id = board.id] send in

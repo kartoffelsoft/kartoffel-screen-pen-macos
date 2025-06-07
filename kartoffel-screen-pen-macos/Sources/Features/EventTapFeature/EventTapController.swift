@@ -16,6 +16,7 @@ public class EventTapController {
         var mask: CGEventMask = 0
         mask |= (1 << CGEventType.keyDown.rawValue)
         mask |= (1 << CGEventType.keyUp.rawValue)
+        mask |= (1 << CGEventType.mouseMoved.rawValue)
         mask |= (1 << CGEventType.leftMouseDown.rawValue)
         mask |= (1 << CGEventType.leftMouseDragged.rawValue)
         mask |= (1 << CGEventType.leftMouseUp.rawValue)
@@ -79,6 +80,10 @@ public class EventTapController {
             if event.getIntegerValueField(.keyboardEventKeycode) == 53 {
                 weakSelf.viewStore.send(.delegate(.escKeyDown))
             }
+            return nil
+            
+        case .mouseMoved:
+            weakSelf.viewStore.send(.delegate(.mouseMoved(event.location)))
             return nil
             
         case .leftMouseDown:
