@@ -42,6 +42,13 @@ let package = Package(
             path: "./Sources/Features/AppRootFeature"
         ),
         .target(
+            name: "ColorPickerFeature",
+            dependencies: [
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+            ],
+            path: "./Sources/Features/ColorPickerFeature"
+        ),
+        .target(
             name: "EventTapFeature",
             dependencies: [
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
@@ -68,6 +75,7 @@ let package = Package(
         .target(
             name: "MenuFeature",
             dependencies: [
+                "ColorPickerFeature",
                 "Common",
                 "HotKeyFeature",
                 "StyleGuide",

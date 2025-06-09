@@ -1,4 +1,5 @@
 import AppKit
+import ColorPickerFeature
 import Combine
 import ComposableArchitecture
 import HotKeyFeature
@@ -11,12 +12,18 @@ public class MenuController: NSObject {
     private let viewStore: ViewStoreOf<Menu>
     private var cancellables: Set<AnyCancellable> = []
     
+    private let colorPickerView: ColorPickerView
     private let hotKeyController: HotKeyController
     private let statusBarItem = NSStatusBar.system.statusItem(withLength: 20)
 
     public init(store: StoreOf<Menu>) {
         self.store = store
         self.viewStore = ViewStore(store, observe: { $0 })
+        
+        self.colorPickerView = .init(store: self.store.scope(
+            state: \.colorPicker,
+            action: Menu.Action.colorPicker
+        ))
         
         self.hotKeyController = .init(store: self.store.scope(
             state: \.hotKey,
@@ -57,6 +64,12 @@ public class MenuController: NSObject {
         clear.target = self
         mainMenu.addItem(clear)
         
+        mainMenu.addItem(NSMenuItem.separator())
+        
+        let colorPicker = NSMenuItem()
+        colorPicker.view = colorPickerView
+        mainMenu.addItem(colorPicker)
+
         mainMenu.addItem(NSMenuItem.separator())
         
         let quit = NSMenuItem(
