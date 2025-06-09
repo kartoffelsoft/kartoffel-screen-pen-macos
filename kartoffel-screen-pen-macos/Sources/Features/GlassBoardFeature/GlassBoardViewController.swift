@@ -106,7 +106,15 @@ public class GlassBoardViewController: NSViewController {
             
             switch drawing.drawingTool {
             case let .pen(color):
-                ()
+                path.withUnsafeBufferPointer { buffer in
+                    guard let baseAddress = buffer.baseAddress else { return }
+                    self.renderer.addPolyline(
+                        with: baseAddress,
+                        count: path.count,
+                        color: color,
+                        thickness: 4.0
+                    )
+                }
                 
             case let .laserPointer(color):
                 path.withUnsafeBufferPointer { buffer in

@@ -24,7 +24,7 @@ public struct GlassBoard: Reducer {
         case continueDraw(CGPoint)
         case dismiss
         case endDraw(CGPoint)
-        case selectTool(DrawingTool)
+        case selectDrawingTool(DrawingTool)
         case updateFrame(CGRect)
         
         case delegate(DelegateAction)
@@ -68,7 +68,7 @@ public struct GlassBoard: Reducer {
                 state.drawings[lastIndex].add(point: point)
                 return .none
                 
-            case let .selectTool(tool):
+            case let .selectDrawingTool(tool):
                 state.currentDrawingTool = tool
                 return .none
                 

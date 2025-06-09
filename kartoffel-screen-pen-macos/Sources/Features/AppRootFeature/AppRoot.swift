@@ -108,20 +108,20 @@ public struct AppRoot: Reducer {
                 return .none
                 
             case .menu(.delegate(.selectPen)):
-                state.drawingTool = .pen(color: .white)
-                return .run { [boardIds = state.glassBoards.map{$0.id}, tool = state.drawingTool] send in
+                state.drawingTool = .pen(color: state.color)
+                return .run { [boardIds = state.glassBoards.map{$0.id}, drawingTool = state.drawingTool] send in
                     await send(.eventTap(.activate))
                     for id in boardIds {
-                        await send(.glassBoards(id: id, action: .selectTool(tool)))
+                        await send(.glassBoards(id: id, action: .selectDrawingTool(drawingTool)))
                     }
                 }
                 
             case .menu(.delegate(.selectLaserPointer)):
                 state.drawingTool = .laserPointer(color: state.color)
-                return .run { [boardIds = state.glassBoards.map{$0.id}, tool = state.drawingTool] send in
+                return .run { [boardIds = state.glassBoards.map{$0.id}, drawingTool = state.drawingTool] send in
                     await send(.eventTap(.activate))
                     for id in boardIds {
-                        await send(.glassBoards(id: id, action: .selectTool(tool)))
+                        await send(.glassBoards(id: id, action: .selectDrawingTool(drawingTool)))
                     }
                 }
                 
