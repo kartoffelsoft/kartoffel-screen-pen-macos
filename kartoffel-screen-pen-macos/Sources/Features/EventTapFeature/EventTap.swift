@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import CoreGraphics
 import Foundation
 
 public struct EventTap: Reducer {
@@ -19,6 +20,7 @@ public struct EventTap: Reducer {
         
         public enum DelegateAction: Equatable {
 
+            case commandKeyDownWith(CGKeyCode)
             case escKeyDown
             case leftMouseDown(CGPoint)
             case leftMouseDragged(CGPoint)

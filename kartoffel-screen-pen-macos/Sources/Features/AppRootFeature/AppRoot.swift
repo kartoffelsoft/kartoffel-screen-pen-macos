@@ -24,6 +24,7 @@ public struct AppRoot: Reducer {
     
     public enum Action {
         
+        case notifyGlassBoardsDrawToolChange
         case updateGlassBoards([(UInt32, NSRect)])
         
         case appRootDelegate(AppRootDelegate.Action)
@@ -37,6 +38,14 @@ public struct AppRoot: Reducer {
     public var body: some Reducer<State, Action> {
         Reduce { state, action in
             switch action {
+            case .notifyGlassBoardsDrawToolChange:
+                return .run { [boardIds = state.glassBoards.map{$0.id}, drawingTool = state.drawingTool] send in
+                    await send(.eventTap(.activate))
+                    for id in boardIds {
+                        await send(.glassBoards(id: id, action: .selectDrawingTool(drawingTool)))
+                    }
+                }
+                
             case let .updateGlassBoards(screens):
                 var updates: [(UInt32, CGRect)] = []
                 
@@ -66,6 +75,49 @@ public struct AppRoot: Reducer {
                 }
                 
             case .appRootDelegate:
+                return .none
+                
+            case let .eventTap(.delegate(.commandKeyDownWith(keyCode))):
+                switch keyCode {
+                case 18:
+                    return .run { send in
+                        await send(.menu(.colorPicker(.selectButton(1))))
+                    }
+                case 19:
+                    return .run { send in
+                        await send(.menu(.colorPicker(.selectButton(2))))
+                    }
+                case 20:
+                    return .run { send in
+                        await send(.menu(.colorPicker(.selectButton(3))))
+                    }
+                case 21:
+                    return .run { send in
+                        await send(.menu(.colorPicker(.selectButton(4))))
+                    }
+                case 23:
+                    return .run { send in
+                        await send(.menu(.colorPicker(.selectButton(5))))
+                    }
+                case 22:
+                    return .run { send in
+                        await send(.menu(.colorPicker(.selectButton(6))))
+                    }
+                case 26:
+                    return .run { send in
+                        await send(.menu(.colorPicker(.selectButton(7))))
+                    }
+                case 35:
+                    return .run { send in
+                        await send(.menu(.delegate(.selectPen)))
+                    }
+                case 37:
+                    return .run { send in
+                        await send(.menu(.delegate(.selectLaserPointer)))
+                    }
+                default:
+                    break
+                }
                 return .none
                 
             case .eventTap(.delegate(.escKeyDown)):
@@ -127,8 +179,16 @@ public struct AppRoot: Reducer {
                 
             case let .menu(.colorPicker(.delegate(.selectColor(color)))):
                 state.color = color
+                let prevDrawTool = state.drawingTool
                 state.drawingTool = state.drawingTool.with(color: state.color)
-                return .none
+                
+                if state.drawingTool == prevDrawTool {
+                    return .none
+                }
+                
+                return .run { send in
+                    await send(.notifyGlassBoardsDrawToolChange)
+                }
                 
             case .menu:
                 return .none

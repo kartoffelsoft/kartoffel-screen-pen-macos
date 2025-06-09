@@ -6,13 +6,13 @@ public struct ColorPicker: Reducer {
     public struct State: Equatable {
         
         var colorButtons: IdentifiedArrayOf<ColorButtonData> = [
-            .init(id: 0, color: .init(red: 255/255, green:   0/255, blue:   0/255, alpha: 1)),
-            .init(id: 1, color: .init(red: 255/255, green: 165/255, blue:   0/255, alpha: 1)),
-            .init(id: 2, color: .init(red: 255/255, green: 255/255, blue:   0/255, alpha: 1)),
-            .init(id: 3, color: .init(red:   0/255, green: 255/255, blue:   0/255, alpha: 1)),
-            .init(id: 4, color: .init(red:   0/255, green: 255/255, blue: 255/255, alpha: 1)),
-            .init(id: 5, color: .init(red:   0/255, green:   0/255, blue: 255/255, alpha: 1)),
-            .init(id: 6, color: .init(red: 128/255, green:   0/255, blue: 128/255, alpha: 1)),
+            .init(id: 1, color: .init(red: 255/255, green:   0/255, blue:   0/255, alpha: 1)),
+            .init(id: 2, color: .init(red: 255/255, green: 165/255, blue:   0/255, alpha: 1)),
+            .init(id: 3, color: .init(red: 255/255, green: 255/255, blue:   0/255, alpha: 1)),
+            .init(id: 4, color: .init(red:   0/255, green: 255/255, blue:   0/255, alpha: 1)),
+            .init(id: 5, color: .init(red:   0/255, green: 255/255, blue: 255/255, alpha: 1)),
+            .init(id: 6, color: .init(red:   0/255, green:   0/255, blue: 255/255, alpha: 1)),
+            .init(id: 7, color: .init(red: 128/255, green:   0/255, blue: 128/255, alpha: 1)),
         ]
         var selectedButtonId: Int = 0
         
