@@ -5,6 +5,7 @@ import ComposableArchitecture
 import EventTapFeature
 import GlassBoardFeature
 import MenuFeature
+import StyleGuide
 
 public class AppRootController {
 
@@ -17,6 +18,8 @@ public class AppRootController {
     private let eventTapController: EventTapController
     private let menuController: MenuController
 
+    private var cursorWindow: NSWindow!
+    
     @MainActor
     public init(store: StoreOf<AppRoot>) {
         self.store = store
@@ -33,6 +36,7 @@ public class AppRootController {
         ))
         
         setupBindings()
+        setupCursorWindow()
         
         NotificationCenter.default.addObserver(
             self,
@@ -47,7 +51,39 @@ public class AppRootController {
     }
     
     @MainActor
-    private func setupBindings() {        
+    private func setupBindings() {
+        viewStore.publisher.cursorLocation.sink { [weak self] location in
+            guard let self = self else { return }
+            guard let location = location else { return }
+            
+            let screenHeight = NSScreen.main?.frame.height ?? 0
+
+            let cursorSize = cursorWindow.frame.size
+            let x = location.x - cursorSize.width / 2
+            let y = screenHeight - location.y - cursorSize.height / 2
+
+            self.cursorWindow.setFrameOrigin(NSPoint(x: x, y: y))
+        }
+        .store(in: &self.cancellables)
+        
+        viewStore.publisher.drawingTool.sink { [weak self] tool in
+            switch tool {
+            case let .pen(color):
+                break
+                
+            case .laserPointer:
+                CGWarpMouseCursorPosition(CGPoint(x: 0, y: 0))
+                break
+                
+            case .eraser:
+                break
+                
+            default:
+                break
+            }
+        }
+        .store(in: &self.cancellables)
+        
         viewStore.publisher.fetchScreensSignal.sink { [weak self] signal in
             guard signal.isValid else { return }
             guard let self = self else { return }
@@ -99,6 +135,31 @@ public class AppRootController {
         }
         
         self.viewStore.send(.updateGlassBoards(screens))
+    }
+    
+    @MainActor
+    private func setupCursorWindow() {
+        cursorWindow = NSWindow(
+            contentRect: NSRect(x: 0, y: 0, width: 32, height: 32),
+            styleMask: .borderless,
+            backing: .buffered,
+            defer: false
+        )
+        
+        cursorWindow.level = .screenSaver
+        cursorWindow.isOpaque = false
+        cursorWindow.backgroundColor = .clear
+        cursorWindow.hasShadow = false
+        cursorWindow.ignoresMouseEvents = true
+        cursorWindow.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
+
+        let imageView = NSImageView(frame: cursorWindow.contentView!.bounds)
+        imageView.image = NSImage.theme.appIcon
+        imageView.image?.isTemplate = false
+        imageView.imageScaling = .scaleProportionallyUpOrDown
+        cursorWindow.contentView?.addSubview(imageView)
+
+        cursorWindow.makeKeyAndOrderFront(nil)
     }
     
     @MainActor

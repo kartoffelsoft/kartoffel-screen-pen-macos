@@ -19,5 +19,6 @@ public class GlassBoardWindow: NSWindow {
         self.ignoresMouseEvents = true
     }
     
-    public override var canBecomeKey: Bool { true }
+    public override var canBecomeKey: Bool { false }
+    public override var canBecomeMain: Bool { false }
 }

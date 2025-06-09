@@ -10,6 +10,7 @@ public struct AppRoot: Reducer {
     public struct State: Equatable {
 
         var appRootDelegate: AppRootDelegate.State = .init()
+        var cursorLocation: CGPoint?
         var eventTap: EventTap.State = .init()
         var fetchScreensSignal: Signal = .init()
         var glassBoards: IdentifiedArrayOf<GlassBoard.State> = []
@@ -76,9 +77,11 @@ public struct AppRoot: Reducer {
                 }
                 
             case let .eventTap(.delegate(.mouseMoved(location))):
+                state.cursorLocation = location
                 return .none
                 
             case let .eventTap(.delegate(.leftMouseDown(location))):
+                state.cursorLocation = location
                 if let board = state.glassBoards.first(where: { $0.frame.contains(location) }) {
                     return .run { [id = board.id] send in
                         await send(.glassBoards(id: id, action: .beginDraw(location)))
@@ -87,6 +90,7 @@ public struct AppRoot: Reducer {
                 return .none
                 
             case let .eventTap(.delegate(.leftMouseDragged(location))):
+                state.cursorLocation = location
                 if let board = state.glassBoards.first(where: { $0.frame.contains(location) }) {
                     return .run { [id = board.id] send in
                         await send(.glassBoards(id: id, action: .continueDraw(location)))
@@ -95,6 +99,7 @@ public struct AppRoot: Reducer {
                 return .none
 
             case let .eventTap(.delegate(.leftMouseUp(location))):
+                state.cursorLocation = location
                 if let board = state.glassBoards.first(where: { $0.frame.contains(location) }) {
                     return .run { [id = board.id] send in
                         await send(.glassBoards(id: id, action: .endDraw(location)))
