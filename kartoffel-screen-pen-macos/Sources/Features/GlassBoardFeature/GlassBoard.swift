@@ -8,7 +8,7 @@ public struct GlassBoard: Reducer {
         
         public let id: UInt32
         public var frame: NSRect
-        public var currentDrawingTool: DrawingTool = .laserPointer
+        public var currentDrawingTool: DrawingTool = .none
         public var drawings: [DrawingData] = []
         
         public init(id: UInt32, frame: NSRect) {
@@ -24,6 +24,7 @@ public struct GlassBoard: Reducer {
         case continueDraw(CGPoint)
         case dismiss
         case endDraw(CGPoint)
+        case selectTool(DrawingTool)
         case updateFrame(CGRect)
         
         case delegate(DelegateAction)
@@ -65,6 +66,10 @@ public struct GlassBoard: Reducer {
             case let .endDraw(point):
                 guard let lastIndex = state.drawings.indices.last else { return .none}
                 state.drawings[lastIndex].add(point: point)
+                return .none
+                
+            case let .selectTool(tool):
+                state.currentDrawingTool = tool
                 return .none
                 
             case let .updateFrame(frame):

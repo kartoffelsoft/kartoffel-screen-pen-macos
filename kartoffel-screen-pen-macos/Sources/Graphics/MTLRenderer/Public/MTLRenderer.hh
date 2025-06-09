@@ -1,3 +1,4 @@
+#import <CoreGraphics/CoreGraphics.h>
 #import <Foundation/Foundation.h>
 
 #include <MetalKit/MetalKit.h>
@@ -26,13 +27,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)addPolylineWith:(const CGPoint *)path
                   count:(NSInteger)count
-                  color:(NSColor *)color
+                  color:(CGColorRef)color
               thickness:(CGFloat)thickness;
 
 - (void)addTextureWith:(id<MTLTexture>)texture
                     p1:(CGPoint)p1
                     p2:(CGPoint)p2
-                 color:(NSColor *)color;
+                 color:(CGColorRef)color;
 
 - (void)pushClipRect:(CGRect)rect;
 - (void)popClipRect;

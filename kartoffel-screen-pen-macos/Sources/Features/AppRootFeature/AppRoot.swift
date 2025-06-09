@@ -1,5 +1,6 @@
 import Common
 import ComposableArchitecture
+import CoreGraphics
 import EventTapFeature
 import Foundation
 import GlassBoardFeature
@@ -16,6 +17,7 @@ public struct AppRoot: Reducer {
         var menu: Menu.State = .init()
         var showGlassBoards: [UInt32] = []
         var drawingTool: DrawingTool = .none
+        var color: CGColor = .init(red: 1, green: 0, blue: 0, alpha: 1)
         
         public init() {}
     }
@@ -107,15 +109,26 @@ public struct AppRoot: Reducer {
                 
             case .menu(.delegate(.selectPen)):
                 state.drawingTool = .pen(color: .white)
-                return .run { send in
+                return .run { [boardIds = state.glassBoards.map{$0.id}, tool = state.drawingTool] send in
                     await send(.eventTap(.activate))
+                    for id in boardIds {
+                        await send(.glassBoards(id: id, action: .selectTool(tool)))
+                    }
                 }
                 
             case .menu(.delegate(.selectLaserPointer)):
-                state.drawingTool = .laserPointer
-                return .run { send in
+                state.drawingTool = .laserPointer(color: state.color)
+                return .run { [boardIds = state.glassBoards.map{$0.id}, tool = state.drawingTool] send in
                     await send(.eventTap(.activate))
+                    for id in boardIds {
+                        await send(.glassBoards(id: id, action: .selectTool(tool)))
+                    }
                 }
+                
+            case let .menu(.colorPicker(.delegate(.selectColor(color)))):
+                state.color = color
+                state.drawingTool = state.drawingTool.with(color: state.color)
+                return .none
                 
             case .menu:
                 return .none

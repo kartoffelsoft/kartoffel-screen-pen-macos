@@ -59,7 +59,7 @@
 
 - (void)addPolylineWith:(const CGPoint *)path
                   count:(NSInteger)count
-                  color:(NSColor *)color
+                  color:(CGColorRef)color
               thickness:(CGFloat)thickness {
     std::vector<gui::layout::vec2_t> newPath;
     newPath.reserve(count);
@@ -71,13 +71,20 @@
         newPath.emplace_back(path[i].x, path[i].y);
     }
     
-    _renderer->builder.add_polyline(newPath, {0xFF, 0xFF, 0x00, 0xFF}, thickness);
+    const CGFloat *c = CGColorGetComponents(color);
+    
+    _renderer->builder.add_polyline(newPath,
+                                    {(uint8_t)(c[0] * 255),
+                                     (uint8_t)(c[1] * 255),
+                                     (uint8_t)(c[2] * 255),
+                                     (uint8_t)(c[3] * 255)},
+                                    thickness);
 }
 
 - (void)addTextureWith:(id<MTLTexture>)texture
                     p1:(CGPoint)p1
                     p2:(CGPoint)p2
-                 color:(NSColor *)color {
+                 color:(CGColorRef)color {
     _renderer->builder.add_texture((gui::asset::texture_id_t)(__bridge void *)texture,
                                    {(float)p1.x, (float)p1.y},
                                    {(float)p2.x, (float)p2.y},
