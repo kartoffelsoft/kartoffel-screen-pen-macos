@@ -26,7 +26,6 @@ public struct Menu: Reducer {
         case deactivateHotKey
         case hotKey(HotKey.Action)
         case openMenu
-        case setup
         
         case delegate(DelegateAction)
         
@@ -71,11 +70,6 @@ public struct Menu: Reducer {
             case .openMenu:
                 state.openMenuSignal.fire()
                 return .none
-                
-            case .setup:
-                return .run { [entries = state.hotKeyEntries] send in
-                    await send(.hotKey(.register(entries)))
-                }
                 
             case .delegate:
                 return .none

@@ -60,7 +60,7 @@ public struct AppRoot: Reducer {
             case .appRootDelegate(.delegate(.start)):
                 state.fetchScreensSignal.fire()
                 return .run { send in
-                    await send(.menu(.setup))
+                    await send(.menu(.activateHotKey))
                 }
                 
             case .appRootDelegate:

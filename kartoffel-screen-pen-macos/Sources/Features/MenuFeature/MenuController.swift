@@ -102,6 +102,11 @@ extension MenuController: NSMenuDelegate {
     
     public func menuWillOpen(_ menu: NSMenu) {
         viewStore.send(.deactivateHotKey)
+        
+        let keyDown = CGEvent(keyboardEventSource: nil, virtualKey: 0x7D, keyDown: true)
+        let keyUp = CGEvent(keyboardEventSource: nil, virtualKey: 0x7D, keyDown: false)
+        keyDown?.post(tap: .cghidEventTap)
+        keyUp?.post(tap: .cghidEventTap)
     }
     
     public func menuDidClose(_ menu: NSMenu) {
