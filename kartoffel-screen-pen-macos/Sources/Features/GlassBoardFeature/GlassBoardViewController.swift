@@ -89,13 +89,33 @@ public class GlassBoardViewController: NSViewController {
             let path = Array(drawing.path.suffix(9))
             guard path.count >= 2 else { return }
             
-            renderer.beginDraw(
-                onTexture: canvas,
-                loadAction: MTLLoadAction.load,
-                width: view.bounds.width,
-                height: view.bounds.height,
-                scale: self.view.window?.screen?.backingScaleFactor ?? NSScreen.main?.backingScaleFactor ?? 1.0
-            )
+            switch drawing.drawingTool {
+            case .laserPointer:
+                renderer.beginDraw(
+                    onTexture: canvas,
+                    loadAction: MTLLoadAction.clear,
+                    width: view.bounds.width,
+                    height: view.bounds.height,
+                    scale: self.view.window?.screen?.backingScaleFactor ?? NSScreen.main?.backingScaleFactor ?? 1.0
+                )
+                break
+                
+            case .pen:
+                fallthrough
+                
+            case .eraser:
+                fallthrough
+                
+            default:
+                renderer.beginDraw(
+                    onTexture: canvas,
+                    loadAction: MTLLoadAction.load,
+                    width: view.bounds.width,
+                    height: view.bounds.height,
+                    scale: self.view.window?.screen?.backingScaleFactor ?? NSScreen.main?.backingScaleFactor ?? 1.0
+                )
+                break
+            }
             
             self.renderer.pushClipRect(.init(
                 x: 0,
@@ -123,7 +143,7 @@ public class GlassBoardViewController: NSViewController {
                         with: baseAddress,
                         count: path.count,
                         color: color,
-                        thickness: 4.0
+                        thickness: 6.0
                     )
                 }
                 

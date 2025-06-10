@@ -66,10 +66,22 @@ public struct GlassBoard: Reducer {
             case let .endDraw(point):
                 guard let lastIndex = state.drawings.indices.last else { return .none}
                 state.drawings[lastIndex].add(point: point)
+                
+                if case .laserPointer = state.currentDrawingTool {
+                    return .run { send in
+                        await send(.clear)
+                    }
+                }
                 return .none
                 
             case let .selectDrawingTool(tool):
                 state.currentDrawingTool = tool
+                
+                if case .laserPointer = state.currentDrawingTool {
+                    return .run { send in
+                        await send(.clear)
+                    }
+                }
                 return .none
                 
             case let .updateFrame(frame):
