@@ -11,7 +11,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		BFCCB8102DB8CC760060C80A /* Screen Pen.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Screen Pen.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		BFCCB8102DB8CC760060C80A /* ScreenPen.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ScreenPen.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BFCCB8252DB8E2610060C80A /* kartoffel-screen-pen-macos */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = "kartoffel-screen-pen-macos"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
@@ -48,7 +48,7 @@
 		BFCCB8112DB8CC760060C80A /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				BFCCB8102DB8CC760060C80A /* Screen Pen.app */,
+				BFCCB8102DB8CC760060C80A /* ScreenPen.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -83,7 +83,7 @@
 				BFCCB8302DB8E5700060C80A /* AppRootFeature */,
 			);
 			productName = "kartoffel-screen-pen-macos";
-			productReference = BFCCB8102DB8CC760060C80A /* Screen Pen.app */;
+			productReference = BFCCB8102DB8CC760060C80A /* ScreenPen.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -283,7 +283,7 @@
 				);
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.kartoffelsoft.kartoffel-screen-pen-macos";
-				PRODUCT_NAME = "Screen Pen";
+				PRODUCT_NAME = ScreenPen;
 				REGISTER_APP_GROUPS = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -312,7 +312,7 @@
 				);
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.kartoffelsoft.kartoffel-screen-pen-macos";
-				PRODUCT_NAME = "Screen Pen";
+				PRODUCT_NAME = ScreenPen;
 				REGISTER_APP_GROUPS = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
