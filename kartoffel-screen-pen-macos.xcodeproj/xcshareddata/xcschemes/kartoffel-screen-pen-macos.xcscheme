@@ -16,7 +16,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "BFCCB80F2DB8CC760060C80A"
-               BuildableName = "kartoffel-screen-pen-macos.app"
+               BuildableName = "ScreenPen.app"
                BlueprintName = "kartoffel-screen-pen-macos"
                ReferencedContainer = "container:kartoffel-screen-pen-macos.xcodeproj">
             </BuildableReference>
@@ -45,7 +45,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "BFCCB80F2DB8CC760060C80A"
-            BuildableName = "kartoffel-screen-pen-macos.app"
+            BuildableName = "ScreenPen.app"
             BlueprintName = "kartoffel-screen-pen-macos"
             ReferencedContainer = "container:kartoffel-screen-pen-macos.xcodeproj">
          </BuildableReference>
@@ -62,7 +62,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "BFCCB80F2DB8CC760060C80A"
-            BuildableName = "kartoffel-screen-pen-macos.app"
+            BuildableName = "ScreenPen.app"
             BlueprintName = "kartoffel-screen-pen-macos"
             ReferencedContainer = "container:kartoffel-screen-pen-macos.xcodeproj">
          </BuildableReference>
