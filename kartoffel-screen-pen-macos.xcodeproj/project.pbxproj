@@ -13,6 +13,9 @@
 /* Begin PBXFileReference section */
 		BFCCB8102DB8CC760060C80A /* ScreenPen.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ScreenPen.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BFCCB8252DB8E2610060C80A /* kartoffel-screen-pen-macos */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = "kartoffel-screen-pen-macos"; sourceTree = SOURCE_ROOT; };
+		BFEB0EBA2DF96D0500E04EC9 /* codesign-app.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "codesign-app.sh"; sourceTree = "<group>"; };
+		BFEB0EBB2DF96FCA00E04EC9 /* make-package.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "make-package.sh"; sourceTree = "<group>"; };
+		BFEB0EBC2DF9715500E04EC9 /* notarize.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = notarize.sh; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -41,6 +44,7 @@
 				BFCCB8252DB8E2610060C80A /* kartoffel-screen-pen-macos */,
 				BFCCB8122DB8CC760060C80A /* AppMain */,
 				BFCCB82F2DB8E5700060C80A /* Frameworks */,
+				BFEB0EB92DF96CD900E04EC9 /* scripts */,
 				BFCCB8112DB8CC760060C80A /* Products */,
 			);
 			sourceTree = "<group>";
@@ -58,6 +62,16 @@
 			children = (
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		BFEB0EB92DF96CD900E04EC9 /* scripts */ = {
+			isa = PBXGroup;
+			children = (
+				BFEB0EBA2DF96D0500E04EC9 /* codesign-app.sh */,
+				BFEB0EBB2DF96FCA00E04EC9 /* make-package.sh */,
+				BFEB0EBC2DF9715500E04EC9 /* notarize.sh */,
+			);
+			path = scripts;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
