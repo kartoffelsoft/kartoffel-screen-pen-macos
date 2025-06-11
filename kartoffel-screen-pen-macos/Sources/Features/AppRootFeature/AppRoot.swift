@@ -109,11 +109,20 @@ public struct AppRoot: Reducer {
                     }
                 case 35:
                     return .run { send in
-                        await send(.menu(.delegate(.selectPen)))
+                        await send(.menu(.delegate(.selectDrawingTool(.pen(color: .clear)))))
                     }
                 case 37:
                     return .run { send in
-                        await send(.menu(.delegate(.selectLaserPointer)))
+                        await send(.menu(.delegate(.selectDrawingTool(.laserPointer(color: .clear)))))
+                    }
+                case 6:
+                    return .run { send in
+                    }
+                case 7:
+                    return .run { [boardIds = state.glassBoards.map{$0.id}] send in
+                        for id in boardIds {
+                            await send(.glassBoards(id: id, action: .clear))
+                        }
                     }
                 default:
                     break
@@ -159,17 +168,8 @@ public struct AppRoot: Reducer {
             case .glassBoards:
                 return .none
                 
-            case .menu(.delegate(.selectPen)):
-                state.drawingTool = .pen(color: state.color)
-                return .run { [boardIds = state.glassBoards.map{$0.id}, drawingTool = state.drawingTool] send in
-                    await send(.eventTap(.activate))
-                    for id in boardIds {
-                        await send(.glassBoards(id: id, action: .selectDrawingTool(drawingTool)))
-                    }
-                }
-                
-            case .menu(.delegate(.selectLaserPointer)):
-                state.drawingTool = .laserPointer(color: state.color)
+            case let .menu(.delegate(.selectDrawingTool(drawingTool))):
+                state.drawingTool = drawingTool.with(color: state.color)
                 return .run { [boardIds = state.glassBoards.map{$0.id}, drawingTool = state.drawingTool] send in
                     await send(.eventTap(.activate))
                     for id in boardIds {

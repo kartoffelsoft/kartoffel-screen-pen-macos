@@ -78,7 +78,7 @@ public class EventTapController {
         case .keyDown:
             let keyCode = CGKeyCode(event.getIntegerValueField(.keyboardEventKeycode))
             if event.flags.contains(.maskCommand) {
-                let keyCodesOfInterests: Set<CGKeyCode> = [18, 19, 20, 21, 23, 22, 26, 35, 37]
+                let keyCodesOfInterests: Set<CGKeyCode> = [18, 19, 20, 21, 23, 22, 26, 35, 37, 6, 7]
                 if keyCodesOfInterests.contains(keyCode) {
                     weakSelf.viewStore.send(.delegate(.commandKeyDownWith(keyCode)))
                 }
