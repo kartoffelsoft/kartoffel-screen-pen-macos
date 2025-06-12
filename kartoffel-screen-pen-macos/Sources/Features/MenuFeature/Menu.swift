@@ -35,6 +35,7 @@ public struct Menu: Reducer {
         public enum DelegateAction: Equatable {
 
             case openHelp
+            case openSettings
             case selectDrawingTool(DrawingTool)
         }
     }

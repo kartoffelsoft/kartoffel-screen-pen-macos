@@ -35,7 +35,9 @@ let package = Package(
                 "Common",
                 "EventTapFeature",
                 "GlassBoardFeature",
+                "HelpFeature",
                 "MenuFeature",
+                "SettingsFeature",
                 "StyleGuide",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
             ],
@@ -66,6 +68,13 @@ let package = Package(
             path: "./Sources/Features/GlassBoardFeature"
         ),
         .target(
+            name: "HelpFeature",
+            dependencies: [
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+            ],
+            path: "./Sources/Features/HelpFeature"
+        ),
+        .target(
             name: "HotKeyFeature",
             dependencies: [
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
@@ -82,6 +91,13 @@ let package = Package(
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
             ],
             path: "./Sources/Features/MenuFeature"
+        ),
+        .target(
+            name: "SettingsFeature",
+            dependencies: [
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+            ],
+            path: "./Sources/Features/SettingsFeature"
         ),
         
         .target(

@@ -19,7 +19,7 @@ public class ColorPickerView: NSView {
         self.store = store
         self.viewStore = ViewStore(store, observe: { $0 })
         
-        super.init(frame: NSMakeRect(0, 0, 240, 40))
+        super.init(frame: NSMakeRect(0, 0, 230, 32))
         
         setupConstraints()
         setupBindings()
@@ -61,8 +61,8 @@ public class ColorPickerView: NSView {
  
                 button.translatesAutoresizingMaskIntoConstraints = false
                 NSLayoutConstraint.activate([
-                    button.widthAnchor.constraint(equalToConstant: 28),
-                    button.heightAnchor.constraint(equalToConstant: 28),
+                    button.widthAnchor.constraint(equalToConstant: 26),
+                    button.heightAnchor.constraint(equalToConstant: 26),
                 ])
 
                 stackView.addArrangedSubview(button)

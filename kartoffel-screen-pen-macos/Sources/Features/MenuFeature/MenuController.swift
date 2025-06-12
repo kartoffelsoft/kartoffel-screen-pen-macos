@@ -80,6 +80,14 @@ public class MenuController: NSObject {
         help.target = self
         mainMenu.addItem(help)
         
+        let settings = NSMenuItem(
+            title: "Settings...",
+            action: #selector(handleSettingsClick),
+            keyEquivalent: ""
+        )
+        settings.target = self
+        mainMenu.addItem(settings)
+        
         mainMenu.addItem(NSMenuItem.separator())
         
         let quit = NSMenuItem(
@@ -119,9 +127,13 @@ public class MenuController: NSObject {
     @objc private func handleEraserClick(_ sender: NSMenuItem) {
         viewStore.send(.delegate(.selectDrawingTool(.eraser)))
     }
-    
+
     @objc private func handleHelpClick(_ sender: NSMenuItem) {
         viewStore.send(.delegate(.openHelp))
+    }
+    
+    @objc private func handleSettingsClick(_ sender: NSMenuItem) {
+        viewStore.send(.delegate(.openSettings))
     }
 }
 

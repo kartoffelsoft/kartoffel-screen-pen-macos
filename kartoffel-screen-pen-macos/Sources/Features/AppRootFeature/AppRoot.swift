@@ -4,7 +4,9 @@ import CoreGraphics
 import EventTapFeature
 import Foundation
 import GlassBoardFeature
+import HelpFeature
 import MenuFeature
+import SettingsFeature
 
 public struct AppRoot: Reducer {
 
@@ -14,8 +16,12 @@ public struct AppRoot: Reducer {
         var eventTap: EventTap.State = .init()
         var fetchScreensSignal: Signal = .init()
         var glassBoards: IdentifiedArrayOf<GlassBoard.State> = []
+        var help: Help.State?
         var menu: Menu.State = .init()
+        var settings: Settings.State?
         var showGlassBoards: [UInt32] = []
+        var showHelp: Bool = false
+        var showSettings: Bool = false
         var drawingTool: DrawingTool = .none
         var color: CGColor = .init(red: 1, green: 0, blue: 0, alpha: 1)
         
@@ -30,7 +36,9 @@ public struct AppRoot: Reducer {
         case appRootDelegate(AppRootDelegate.Action)
         case eventTap(EventTap.Action)
         case glassBoards(id: GlassBoard.State.ID, action: GlassBoard.Action)
+        case help(Help.Action)
         case menu(Menu.Action)
+        case settings(Settings.Action)
     }
 
     public init() {}
@@ -180,6 +188,24 @@ public struct AppRoot: Reducer {
             case .glassBoards:
                 return .none
                 
+            case .help(.delegate(.dismiss)):
+                state.help = nil
+                state.showHelp = false
+                return .none
+                
+            case .help:
+                return .none
+                
+            case .menu(.delegate(.openHelp)):
+                state.help = .init()
+                state.showHelp = true
+                return .none
+                
+            case .menu(.delegate(.openSettings)):
+                state.settings = .init()
+                state.showSettings = true
+                return .none
+                
             case let .menu(.delegate(.selectDrawingTool(drawingTool))):
                 state.drawingTool = drawingTool.with(color: state.color)
                 return .run { [boardIds = state.glassBoards.map{$0.id}, drawingTool = state.drawingTool] send in
@@ -204,6 +230,14 @@ public struct AppRoot: Reducer {
                 
             case .menu:
                 return .none
+                
+            case .settings(.delegate(.dismiss)):
+                state.settings = nil
+                state.showSettings = false
+                return .none
+                
+            case .settings:
+                return .none
             }
         }
         Scope(state: \.appRootDelegate, action: /Action.appRootDelegate) {
@@ -217,6 +251,12 @@ public struct AppRoot: Reducer {
         }
         .forEach(\.glassBoards, action: /Action.glassBoards) {
             GlassBoard()
+        }
+        .ifLet(\.help, action: /Action.help) {
+            Help()
+        }
+        .ifLet(\.settings, action: /Action.settings) {
+            Settings()
         }
     }
 }

@@ -4,7 +4,9 @@ import Combine
 import ComposableArchitecture
 import EventTapFeature
 import GlassBoardFeature
+import HelpFeature
 import MenuFeature
+import SettingsFeature
 
 public class AppRootController {
 
@@ -15,8 +17,10 @@ public class AppRootController {
     private var glassBoardWindowControllers: IdentifiedArrayOf<GlassBoardWindowController> = []
     
     private let eventTapController: EventTapController
+    private let helpWindowController: HelpWindowController
     private let menuController: MenuController
-
+    private let settingsWindowController: SettingsWindowController
+    
     @MainActor
     public init(store: StoreOf<AppRoot>) {
         self.store = store
@@ -27,10 +31,14 @@ public class AppRootController {
             action: AppRoot.Action.eventTap
         ))
         
+        self.helpWindowController = .init()
+        
         self.menuController = .init(store: self.store.scope(
             state: \.menu,
             action: AppRoot.Action.menu
         ))
+        
+        self.settingsWindowController = .init()
         
         setupBindings()
         
@@ -85,6 +93,56 @@ public class AppRootController {
                 controller.showWindow(self)
                 self.glassBoardWindowControllers.append(controller)
             }
+        }
+        .store(in: &self.cancellables)
+        
+        viewStore.publisher.showHelp.sink { [weak self] show in
+            guard let self = self else { return }
+            
+            guard show else {
+                self.helpWindowController.window?.close()
+                return
+            }
+            
+            self.store
+                .scope(state: \.help, action: AppRoot.Action.help)
+                .ifLet(
+                    then: { [weak self] store in
+                        self?.helpWindowController.contentViewController = HelpViewController(
+                            store: store
+                        )
+                        self?.helpWindowController.showWindow(self)
+                    },
+                    else: { [weak self] in
+                        self?.helpWindowController.window?.close()
+                    }
+                )
+                .store(in: &self.cancellables)
+        }
+        .store(in: &self.cancellables)
+        
+        viewStore.publisher.showSettings.sink { [weak self] show in
+            guard let self = self else { return }
+            
+            guard show else {
+                self.settingsWindowController.window?.close()
+                return
+            }
+            
+            self.store
+                .scope(state: \.settings, action: AppRoot.Action.settings)
+                .ifLet(
+                    then: { [weak self] store in
+                        self?.settingsWindowController.contentViewController = SettingsViewController(
+                            store: store
+                        )
+                        self?.settingsWindowController.showWindow(self)
+                    },
+                    else: { [weak self] in
+                        self?.settingsWindowController.window?.close()
+                    }
+                )
+                .store(in: &self.cancellables)
         }
         .store(in: &self.cancellables)
     }
