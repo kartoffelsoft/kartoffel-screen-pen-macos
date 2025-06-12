@@ -59,7 +59,7 @@ public class MenuController: NSObject {
         let eraser = NSMenuItem(
             title: "Eraser",
             action: #selector(handleEraserClick),
-            keyEquivalent: ""
+            keyEquivalent: "e"
         )
         eraser.target = self
         mainMenu.addItem(eraser)
@@ -70,6 +70,16 @@ public class MenuController: NSObject {
         colorPicker.view = colorPickerView
         mainMenu.addItem(colorPicker)
 
+        mainMenu.addItem(NSMenuItem.separator())
+        
+        let help = NSMenuItem(
+            title: "Keyboard Shortcuts Help",
+            action: #selector(handleHelpClick),
+            keyEquivalent: ""
+        )
+        help.target = self
+        mainMenu.addItem(help)
+        
         mainMenu.addItem(NSMenuItem.separator())
         
         let quit = NSMenuItem(
@@ -108,6 +118,10 @@ public class MenuController: NSObject {
     
     @objc private func handleEraserClick(_ sender: NSMenuItem) {
         viewStore.send(.delegate(.selectDrawingTool(.eraser)))
+    }
+    
+    @objc private func handleHelpClick(_ sender: NSMenuItem) {
+        viewStore.send(.delegate(.openHelp))
     }
 }
 

@@ -14,7 +14,7 @@ public struct ColorPicker: Reducer {
             .init(id: 6, color: .init(red:   0/255, green:   0/255, blue: 255/255, alpha: 1)),
             .init(id: 7, color: .init(red: 128/255, green:   0/255, blue: 128/255, alpha: 1)),
         ]
-        var selectedButtonId: Int = 0
+        var selectedButtonId: Int = 1
         
         public init() {
             colorButtons[id: selectedButtonId]?.isSelected = true

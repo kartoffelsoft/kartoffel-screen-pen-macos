@@ -180,8 +180,8 @@ public class GlassBoardViewController: NSViewController {
                         self.renderer.addPolyline(
                             with: baseAddress,
                             count: path.count,
-                            color: color.copy(alpha: 0.8) ?? .clear,
-                            thickness: 10.0
+                            color: color,
+                            thickness: 6.0
                         )
                     }
                     

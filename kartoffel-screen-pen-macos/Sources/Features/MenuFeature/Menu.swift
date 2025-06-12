@@ -14,7 +14,7 @@ public struct Menu: Reducer {
         let hotKeyEntries: [HotKeyEntry] = [
             .init(
                 id: MenuKey.openMenu.rawValue,
-                keyEquivalent: "p",
+                keyEquivalent: "k",
                 keyEquivalentModifierMask: [.control, .option, .command]
             ),
         ]
@@ -34,6 +34,7 @@ public struct Menu: Reducer {
         
         public enum DelegateAction: Equatable {
 
+            case openHelp
             case selectDrawingTool(DrawingTool)
         }
     }
