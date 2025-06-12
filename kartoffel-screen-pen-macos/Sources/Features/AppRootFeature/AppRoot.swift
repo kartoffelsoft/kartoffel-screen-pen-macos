@@ -118,7 +118,7 @@ public struct AppRoot: Reducer {
                 case 6:
                     return .run { send in
                     }
-                case 7:
+                case 45:
                     return .run { [boardIds = state.glassBoards.map{$0.id}] send in
                         for id in boardIds {
                             await send(.glassBoards(id: id, action: .clear))

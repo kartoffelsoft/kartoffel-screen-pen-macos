@@ -2,6 +2,7 @@ import Foundation
 
 public struct DrawingData: Equatable {
     
+    public var completedAt: Date?
     public var drawingTool: DrawingTool
     public var minX: CGFloat
     public var minY: CGFloat

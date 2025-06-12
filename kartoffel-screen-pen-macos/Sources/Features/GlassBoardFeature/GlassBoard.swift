@@ -66,6 +66,7 @@ public struct GlassBoard: Reducer {
             case let .endDraw(point):
                 guard let lastIndex = state.drawings.indices.last else { return .none}
                 state.drawings[lastIndex].add(point: point)
+                state.drawings[lastIndex].completedAt = Date()
                 
                 if case .laserPointer = state.currentDrawingTool {
                     return .run { send in
