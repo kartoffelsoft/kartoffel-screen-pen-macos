@@ -67,11 +67,13 @@ public class GlassBoardViewController: NSViewController {
         }
         .store(in: &self.cancellables)
         
-        viewStore.publisher.drawings.sink { [weak self] drawings in
+        viewStore.publisher.command.sink { [weak self] command in
             guard let self = self else { return }
             guard let canvas = self.canvas else { return }
             
-            guard !drawings.isEmpty else {
+            if case .none = command.data { return }
+            
+            if case .clear = command.data {
                 renderer.beginDraw(
                     onTexture: canvas,
                     loadAction: MTLLoadAction.clear,
@@ -84,13 +86,7 @@ public class GlassBoardViewController: NSViewController {
                 return
             }
             
-            guard let drawing = drawings.last else { return }
-            
-            let path = Array(drawing.path.suffix(9))
-            guard path.count >= 2 else { return }
-            
-            switch drawing.drawingTool {
-            case .laserPointer:
+            if case .refresh = command.data {
                 renderer.beginDraw(
                     onTexture: canvas,
                     loadAction: MTLLoadAction.clear,
@@ -98,66 +94,105 @@ public class GlassBoardViewController: NSViewController {
                     height: view.bounds.height,
                     scale: self.view.window?.screen?.backingScaleFactor ?? NSScreen.main?.backingScaleFactor ?? 1.0
                 )
-                break
                 
-            case .pen:
-                fallthrough
-                
-            case .eraser:
-                fallthrough
-                
-            default:
-                renderer.beginDraw(
-                    onTexture: canvas,
-                    loadAction: MTLLoadAction.load,
+                self.renderer.pushClipRect(.init(
+                    x: 0,
+                    y: 0,
                     width: view.bounds.width,
                     height: view.bounds.height,
-                    scale: self.view.window?.screen?.backingScaleFactor ?? NSScreen.main?.backingScaleFactor ?? 1.0
-                )
-                break
-            }
-            
-            self.renderer.pushClipRect(.init(
-                x: 0,
-                y: 0,
-                width: view.bounds.width,
-                height: view.bounds.height,
-            ))
-            
-            switch drawing.drawingTool {
-            case let .pen(color):
-                path.withUnsafeBufferPointer { buffer in
-                    guard let baseAddress = buffer.baseAddress else { return }
-                    self.renderer.addPolyline(
-                        with: baseAddress,
-                        count: path.count,
-                        color: color,
-                        thickness: 4.0
-                    )
+                ))
+                
+                for drawing in viewStore.drawings {
+                    guard drawing.path.count >= 2 else { continue }
+                    if case let .pen(color) = drawing.drawingTool {
+                        drawing.path.withUnsafeBufferPointer { buffer in
+                            guard let baseAddress = buffer.baseAddress else { return }
+                            self.renderer.addPolyline(
+                                with: baseAddress,
+                                count: drawing.path.count,
+                                color: color,
+                                thickness: 4.0
+                            )
+                        }
+                    }
                 }
                 
-            case let .laserPointer(color):
-                path.withUnsafeBufferPointer { buffer in
-                    guard let baseAddress = buffer.baseAddress else { return }
-                    self.renderer.addPolyline(
-                        with: baseAddress,
-                        count: path.count,
-                        color: color.copy(alpha: 0.8) ?? .clear,
-                        thickness: 10.0
-                    )
-                }
+                self.renderer.popClipRect()
                 
-            case .eraser:
-                ()
-                
-            default: ()
+                renderer.endDraw()
+                self.mtkView.needsDisplay = true
+                return
             }
             
-            self.renderer.popClipRect()
-            
-            renderer.endDraw()
-            
-            self.mtkView.needsDisplay = true
+            if case .draw = command.data {
+                guard let drawing = viewStore.drawings.last else { return }
+
+                let path = Array(drawing.path.suffix(9))
+                guard path.count >= 2 else { return }
+
+                switch drawing.drawingTool {
+                case let .pen(color):
+                    renderer.beginDraw(
+                        onTexture: canvas,
+                        loadAction: .load,
+                        width: view.bounds.width,
+                        height: view.bounds.height,
+                        scale: self.view.window?.screen?.backingScaleFactor ?? NSScreen.main?.backingScaleFactor ?? 1.0
+                    )
+                    
+                    self.renderer.pushClipRect(.init(
+                        x: 0,
+                        y: 0,
+                        width: view.bounds.width,
+                        height: view.bounds.height,
+                    ))
+                    
+                    path.withUnsafeBufferPointer { buffer in
+                        guard let baseAddress = buffer.baseAddress else { return }
+                        self.renderer.addPolyline(
+                            with: baseAddress,
+                            count: path.count,
+                            color: color,
+                            thickness: 4.0
+                        )
+                    }
+                    
+                    self.renderer.popClipRect()
+                    
+                case let .laserPointer(color):
+                    renderer.beginDraw(
+                        onTexture: canvas,
+                        loadAction: .clear,
+                        width: view.bounds.width,
+                        height: view.bounds.height,
+                        scale: self.view.window?.screen?.backingScaleFactor ?? NSScreen.main?.backingScaleFactor ?? 1.0
+                    )
+                    
+                    self.renderer.pushClipRect(.init(
+                        x: 0,
+                        y: 0,
+                        width: view.bounds.width,
+                        height: view.bounds.height,
+                    ))
+                    
+                    path.withUnsafeBufferPointer { buffer in
+                        guard let baseAddress = buffer.baseAddress else { return }
+                        self.renderer.addPolyline(
+                            with: baseAddress,
+                            count: path.count,
+                            color: color.copy(alpha: 0.8) ?? .clear,
+                            thickness: 10.0
+                        )
+                    }
+                    
+                    self.renderer.popClipRect()
+                    
+                default: ()
+                }
+                
+                renderer.endDraw()
+                self.mtkView.needsDisplay = true
+            }
         }
         .store(in: &self.cancellables)
     }

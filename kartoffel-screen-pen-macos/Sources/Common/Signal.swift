@@ -14,5 +14,4 @@ public struct Signal: Equatable {
     public var isValid: Bool {
         return self.count != 0
     }
-
 }

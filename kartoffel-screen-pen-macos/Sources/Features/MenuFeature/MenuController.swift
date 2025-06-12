@@ -73,7 +73,7 @@ public class MenuController: NSObject {
         mainMenu.addItem(NSMenuItem.separator())
         
         let quit = NSMenuItem(
-            title: "Quit Screen Pen",
+            title: "Quit ScreenPen",
             action: #selector(NSApp.terminate(_:)),
             keyEquivalent: "q"
         )

@@ -116,9 +116,21 @@ public struct AppRoot: Reducer {
                         await send(.menu(.delegate(.selectDrawingTool(.laserPointer(color: .clear)))))
                     }
                 case 6:
+                    guard case .pen = state.drawingTool else { return .none }
+                    let targetId = state.glassBoards
+                        .compactMap { board -> (id: UInt32, date: Date)? in
+                            guard let date = board.drawings.last?.completedAt else { return nil }
+                            return (id: board.id, date: date)
+                        }
+                        .max(by: { $0.date < $1.date })?
+                        .id
+                    
+                    guard let targetId = targetId else { return .none }
                     return .run { send in
+                        await send(.glassBoards(id: targetId, action: .eraseLast))
                     }
                 case 45:
+                    guard case .pen = state.drawingTool else { return .none }
                     return .run { [boardIds = state.glassBoards.map{$0.id}] send in
                         for id in boardIds {
                             await send(.glassBoards(id: id, action: .clear))
