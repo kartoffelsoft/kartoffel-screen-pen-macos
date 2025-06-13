@@ -2,7 +2,7 @@ import AppKit
 
 class ShortcutView: NSView {
 
-    private let descriptionTextField = {
+    private let textField = {
         let textField = NSTextField()
         textField.backgroundColor = .clear
         textField.isBezeled = false
@@ -11,12 +11,25 @@ class ShortcutView: NSView {
         return textField
     }()
     
+    private let colorImageView: NSImageView = {
+        let view = NSImageView(frame: NSRect(x: 0, y: 0, width: 20, height: 20))
+        view.image = NSImage(systemSymbolName: "square.fill", accessibilityDescription: nil)
+        view.image?.isTemplate = true
+        return view
+    }()
+    
+    private lazy var descriptionView = {
+        let view = NSStackView(views: [textField, colorImageView])
+        view.orientation = .horizontal
+        return view
+    }()
+    
     private let symbolTextField = {
         let textField = NSTextField()
         textField.backgroundColor = .clear
         textField.isBezeled = false
         textField.isEditable = false
-        textField.textColor = .secondaryLabelColor
+        textField.textColor = .labelColor
         return textField
     }()
     
@@ -30,23 +43,38 @@ class ShortcutView: NSView {
     }
 
     func render(_ data: ShortcutData) {
-        descriptionTextField.stringValue = data.description
-        symbolTextField.stringValue = "\(data.keyEquivalentModifiers.symbolicDescription) \(data.keyEquivalent)"
+        symbolTextField.stringValue = data.keyEquivalentModifiers.symbolicDescription.isEmpty
+            ? data.keyEquivalent
+            : "\(data.keyEquivalentModifiers.symbolicDescription) \(data.keyEquivalent)"
+        
+        switch data.description {
+        case let .text(text):
+            textField.stringValue = text
+            textField.isHidden = false
+            colorImageView.isHidden = true
+            break
+            
+        case let .color(color):
+            colorImageView.contentTintColor = color
+            textField.isHidden = true
+            colorImageView.isHidden = false
+            break
+        }
     }
 
     private func setupConstraints() {
-        descriptionTextField.translatesAutoresizingMaskIntoConstraints = false
+        descriptionView.translatesAutoresizingMaskIntoConstraints = false
         symbolTextField.translatesAutoresizingMaskIntoConstraints = false
         
-        addSubview(descriptionTextField)
+        addSubview(descriptionView)
         addSubview(symbolTextField)
         
         NSLayoutConstraint.activate([
-            descriptionTextField.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 8),
-            descriptionTextField.centerYAnchor.constraint(equalTo: centerYAnchor),
-            descriptionTextField.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.7),
+            descriptionView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 8),
+            descriptionView.centerYAnchor.constraint(equalTo: centerYAnchor),
+            descriptionView.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.8),
 
-            symbolTextField.leadingAnchor.constraint(equalTo: descriptionTextField.trailingAnchor, constant: 8),
+            symbolTextField.leadingAnchor.constraint(equalTo: descriptionView.trailingAnchor, constant: 8),
             symbolTextField.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -8),
             symbolTextField.centerYAnchor.constraint(equalTo: centerYAnchor),
             

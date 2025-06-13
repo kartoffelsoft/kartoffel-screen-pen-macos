@@ -8,10 +8,24 @@ public class HelpViewController: NSViewController {
     private let viewStore: ViewStoreOf<Help>
     private var cancellables: Set<AnyCancellable> = []
     
-    private lazy var stackView = {
+    private lazy var globalShortcutsView = {
         let view = NSStackView(views: [])
         view.orientation = .vertical
         view.spacing = 4
+        return view
+    }()
+    
+    private lazy var localShortcutsView = {
+        let view = NSStackView(views: [])
+        view.orientation = .vertical
+        view.spacing = 4
+        return view
+    }()
+    
+    private lazy var contentView = {
+        let view = NSStackView(views: [globalShortcutsView, localShortcutsView])
+        view.orientation = .vertical
+        view.spacing = 24
         return view
     }()
     
@@ -43,7 +57,7 @@ public class HelpViewController: NSViewController {
     }
     
     public override func loadView() {
-        view = NSView(frame: NSMakeRect(0, 0, 640, 320))
+        view = NSView(frame: NSMakeRect(0, 0, 440, 440))
     }
     
     public override func mouseDragged(with event: NSEvent) {
@@ -52,23 +66,23 @@ public class HelpViewController: NSViewController {
     }
     
     private func setupConstraints() {
-        stackView.translatesAutoresizingMaskIntoConstraints = false
+        contentView.translatesAutoresizingMaskIntoConstraints = false
         
-        view.addSubview(stackView)
+        view.addSubview(contentView)
         
         NSLayoutConstraint.activate([
-            stackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            stackView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            stackView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.80),
+            contentView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            contentView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            contentView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.85),
         ])
     }
     
     private func setupBindings() {
-        viewStore.publisher.shortcuts.sink { [weak self] shortcuts in
+        viewStore.publisher.globalShortcuts.sink { [weak self] shortcuts in
             guard let self = self else { return }
             
-            stackView.arrangedSubviews.forEach { view in
-                stackView.removeArrangedSubview(view)
+            globalShortcutsView.arrangedSubviews.forEach { view in
+                globalShortcutsView.removeArrangedSubview(view)
                 view.removeFromSuperview()
             }
             
@@ -79,10 +93,33 @@ public class HelpViewController: NSViewController {
                 view.translatesAutoresizingMaskIntoConstraints = false
                 NSLayoutConstraint.activate([
                     view.widthAnchor.constraint(equalToConstant: 480),
-                    view.heightAnchor.constraint(equalToConstant: 32),
+                    view.heightAnchor.constraint(equalToConstant: 24),
                 ])
 
-                stackView.addArrangedSubview(view)
+                globalShortcutsView.addArrangedSubview(view)
+            }
+        }
+        .store(in: &self.cancellables)
+        
+        viewStore.publisher.localShortcuts.sink { [weak self] shortcuts in
+            guard let self = self else { return }
+            
+            localShortcutsView.arrangedSubviews.forEach { view in
+                localShortcutsView.removeArrangedSubview(view)
+                view.removeFromSuperview()
+            }
+            
+            for shortcut in shortcuts {
+                let view = ShortcutView()
+                view.render(shortcut)
+                
+                view.translatesAutoresizingMaskIntoConstraints = false
+                NSLayoutConstraint.activate([
+                    view.widthAnchor.constraint(equalToConstant: 480),
+                    view.heightAnchor.constraint(equalToConstant: 24),
+                ])
+
+                localShortcutsView.addArrangedSubview(view)
             }
         }
         .store(in: &self.cancellables)
