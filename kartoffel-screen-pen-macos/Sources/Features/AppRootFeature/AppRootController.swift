@@ -14,12 +14,12 @@ public class AppRootController {
     private let viewStore: ViewStoreOf<AppRoot>
     private var cancellables: Set<AnyCancellable> = []
     
-    private var glassBoardWindowControllers: IdentifiedArrayOf<GlassBoardWindowController> = []
-    
     private let eventTapController: EventTapController
-    private let helpWindowController: HelpWindowController
     private let menuController: MenuController
-    private let settingsWindowController: SettingsWindowController
+    
+    private var glassBoardWindowControllers: IdentifiedArrayOf<GlassBoardWindowController> = []
+    private var helpWindowController: HelpWindowController?
+    private var settingsWindowController: SettingsWindowController?
     
     @MainActor
     public init(store: StoreOf<AppRoot>) {
@@ -31,14 +31,10 @@ public class AppRootController {
             action: AppRoot.Action.eventTap
         ))
         
-        self.helpWindowController = .init()
-        
         self.menuController = .init(store: self.store.scope(
             state: \.menu,
             action: AppRoot.Action.menu
         ))
-        
-        self.settingsWindowController = .init()
         
         setupBindings()
         
@@ -57,7 +53,7 @@ public class AppRootController {
     @MainActor
     private func setupBindings() {        
         viewStore.publisher.fetchScreensSignal.sink { [weak self] signal in
-            guard signal.isValid else { return }
+            guard let _ = signal else { return }
             guard let self = self else { return }
             self.fetchScreens()
         }
@@ -96,53 +92,71 @@ public class AppRootController {
         }
         .store(in: &self.cancellables)
         
-        viewStore.publisher.showHelp.sink { [weak self] show in
+        viewStore.publisher.showHelpSignal.sink { [weak self] signal in
+            guard let show = signal?.value else { return }
             guard let self = self else { return }
             
             guard show else {
-                self.helpWindowController.window?.close()
+                self.helpWindowController?.window?.close()
+                self.helpWindowController = nil
                 return
             }
             
-            self.store
-                .scope(state: \.help, action: AppRoot.Action.help)
-                .ifLet(
-                    then: { [weak self] store in
-                        self?.helpWindowController.contentViewController = HelpViewController(
-                            store: store
-                        )
-                        self?.helpWindowController.showWindow(self)
-                    },
-                    else: { [weak self] in
-                        self?.helpWindowController.window?.close()
-                    }
-                )
-                .store(in: &self.cancellables)
+            if self.helpWindowController == nil {
+                self.helpWindowController = .init()
+                self.store
+                    .scope(state: \.help, action: AppRoot.Action.help)
+                    .ifLet(
+                        then: { [weak self] store in
+                            self?.helpWindowController?.contentViewController = HelpViewController(
+                                store: store
+                            )
+                            self?.helpWindowController?.showWindow(self)
+                        },
+                        else: { [weak self] in
+                            self?.helpWindowController?.window?.close()
+                            self?.helpWindowController = nil
+                        }
+                    )
+                    .store(in: &self.cancellables)
+            }
+            
+            self.helpWindowController?.window?.makeKeyAndOrderFront(nil)
+            NSApp.activate(ignoringOtherApps: true)
         }
         .store(in: &self.cancellables)
         
-        viewStore.publisher.showSettings.sink { [weak self] show in
+        viewStore.publisher.showSettingsSignal.sink { [weak self] signal in
+            guard let show = signal?.value else { return }
             guard let self = self else { return }
             
             guard show else {
-                self.settingsWindowController.window?.close()
+                self.settingsWindowController?.window?.close()
+                self.settingsWindowController = nil
                 return
             }
             
-            self.store
-                .scope(state: \.settings, action: AppRoot.Action.settings)
-                .ifLet(
-                    then: { [weak self] store in
-                        self?.settingsWindowController.contentViewController = SettingsViewController(
-                            store: store
-                        )
-                        self?.settingsWindowController.showWindow(self)
-                    },
-                    else: { [weak self] in
-                        self?.settingsWindowController.window?.close()
-                    }
-                )
-                .store(in: &self.cancellables)
+            if self.settingsWindowController == nil {
+                self.settingsWindowController = .init()
+                self.store
+                    .scope(state: \.settings, action: AppRoot.Action.settings)
+                    .ifLet(
+                        then: { [weak self] store in
+                            self?.settingsWindowController?.contentViewController =  SettingsViewController(
+                                store: store
+                            )
+                            self?.settingsWindowController?.showWindow(self)
+                        },
+                        else: { [weak self] in
+                            self?.settingsWindowController?.window?.close()
+                            self?.settingsWindowController = nil
+                        }
+                    )
+                    .store(in: &self.cancellables)
+            }
+            
+            self.settingsWindowController?.window?.makeKeyAndOrderFront(nil)
+            NSApp.activate(ignoringOtherApps: true)
         }
         .store(in: &self.cancellables)
     }

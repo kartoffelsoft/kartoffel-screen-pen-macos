@@ -11,7 +11,7 @@ public struct GlassBoard: Reducer {
         public var currentDrawingTool: DrawingTool = .none
         public var drawings: [DrawingData] = []
         
-        var command: DrawingCommand = .init(.none)
+        var commandSignal: Signal<DrawingCommand>?
         
         public init(id: UInt32, frame: NSRect) {
             self.id = id
@@ -54,13 +54,13 @@ public struct GlassBoard: Reducer {
                 
             case .clear:
                 state.drawings = []
-                state.command = .init(.clear)
+                state.commandSignal = .init(.clear)
                 return .none
                 
             case let .continueDraw(point):
                 guard let lastIndex = state.drawings.indices.last else { return .none }
                 state.drawings[lastIndex].add(point: point)
-                state.command = .init(.draw)
+                state.commandSignal = .init(.draw)
                 return .none
             
             case .dismiss:
@@ -70,14 +70,14 @@ public struct GlassBoard: Reducer {
                 
             case .eraseLast:
                 _ = state.drawings.popLast()
-                state.command = .init(.refresh)
+                state.commandSignal = .init(.refresh)
                 return .none
                 
             case let .endDraw(point):
                 guard let lastIndex = state.drawings.indices.last else { return .none}
                 state.drawings[lastIndex].add(point: point)
                 state.drawings[lastIndex].completedAt = Date()
-                state.command = .init(.draw)
+                state.commandSignal = .init(.draw)
                 
                 if case .laserPointer = state.currentDrawingTool {
                     return .run { send in
@@ -99,7 +99,7 @@ public struct GlassBoard: Reducer {
             case let .updateFrame(frame):
                 state.frame = frame
                 state.drawings = []
-                state.command = .init(.clear)
+                state.commandSignal = .init(.clear)
                 return .none
             
             case .delegate:

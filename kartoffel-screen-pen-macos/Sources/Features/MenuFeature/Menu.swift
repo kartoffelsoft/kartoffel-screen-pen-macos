@@ -9,7 +9,7 @@ public struct Menu: Reducer {
         
         var colorPicker: ColorPicker.State = .init()
         var hotKey: HotKey.State = .init()
-        var openMenuSignal: Signal = .init()
+        var openMenuSignal: Signal<Void>?
         
         let hotKeyEntries: [HotKeyEntry] = [
             .init(
@@ -75,7 +75,7 @@ public struct Menu: Reducer {
                 return .none
                 
             case .openMenu:
-                state.openMenuSignal.fire()
+                state.openMenuSignal = .init()
                 return .none
                 
             case .delegate:

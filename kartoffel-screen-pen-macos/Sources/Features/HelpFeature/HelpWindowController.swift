@@ -4,7 +4,7 @@ public class HelpWindowController: NSWindowController {
 
     public convenience init() {
         self.init(window: NSWindow(
-            contentRect: .init(x: 0, y: 0, width: 800, height: 460),
+            contentRect: .init(x: 0, y: 0, width: 640, height: 320),
             styleMask: [ .closable, .titled, .fullSizeContentView ],
             backing: .buffered,
             defer: false

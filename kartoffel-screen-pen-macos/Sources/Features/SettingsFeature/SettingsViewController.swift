@@ -68,6 +68,6 @@ public class SettingsViewController: NSViewController {
 extension SettingsViewController: NSWindowDelegate {
     
     public func windowWillClose(_ notification: Notification) {
-        viewStore.send(.delegate(.dismiss))
+        viewStore.send(.dismiss)
     }
 }

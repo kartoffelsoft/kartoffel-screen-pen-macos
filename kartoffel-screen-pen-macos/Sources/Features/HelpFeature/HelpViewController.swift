@@ -1,15 +1,17 @@
 import AppKit
+import Combine
 import ComposableArchitecture
 
 public class HelpViewController: NSViewController {
 
     private let store: StoreOf<Help>
     private let viewStore: ViewStoreOf<Help>
+    private var cancellables: Set<AnyCancellable> = []
     
-    private lazy var contentView = {
+    private lazy var stackView = {
         let view = NSStackView(views: [])
         view.orientation = .vertical
-        view.spacing = 16
+        view.spacing = 4
         return view
     }()
     
@@ -41,7 +43,7 @@ public class HelpViewController: NSViewController {
     }
     
     public override func loadView() {
-        view = NSView(frame: NSMakeRect(0, 0, 800, 460))
+        view = NSView(frame: NSMakeRect(0, 0, 640, 320))
     }
     
     public override func mouseDragged(with event: NSEvent) {
@@ -50,24 +52,46 @@ public class HelpViewController: NSViewController {
     }
     
     private func setupConstraints() {
-        contentView.translatesAutoresizingMaskIntoConstraints = false
+        stackView.translatesAutoresizingMaskIntoConstraints = false
         
-        view.addSubview(contentView)
+        view.addSubview(stackView)
         
         NSLayoutConstraint.activate([
-            contentView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            contentView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            contentView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.80),
+            stackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            stackView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            stackView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.80),
         ])
     }
     
     private func setupBindings() {
+        viewStore.publisher.shortcuts.sink { [weak self] shortcuts in
+            guard let self = self else { return }
+            
+            stackView.arrangedSubviews.forEach { view in
+                stackView.removeArrangedSubview(view)
+                view.removeFromSuperview()
+            }
+            
+            for shortcut in shortcuts {
+                let view = ShortcutView()
+                view.render(shortcut)
+                
+                view.translatesAutoresizingMaskIntoConstraints = false
+                NSLayoutConstraint.activate([
+                    view.widthAnchor.constraint(equalToConstant: 480),
+                    view.heightAnchor.constraint(equalToConstant: 32),
+                ])
+
+                stackView.addArrangedSubview(view)
+            }
+        }
+        .store(in: &self.cancellables)
     }
 }
 
 extension HelpViewController: NSWindowDelegate {
     
     public func windowWillClose(_ notification: Notification) {
-        viewStore.send(.delegate(.dismiss))
+        viewStore.send(.dismiss)
     }
 }

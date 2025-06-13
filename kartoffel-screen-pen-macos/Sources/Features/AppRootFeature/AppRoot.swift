@@ -14,14 +14,14 @@ public struct AppRoot: Reducer {
 
         var appRootDelegate: AppRootDelegate.State = .init()
         var eventTap: EventTap.State = .init()
-        var fetchScreensSignal: Signal = .init()
+        var fetchScreensSignal: Signal<Void>?
         var glassBoards: IdentifiedArrayOf<GlassBoard.State> = []
         var help: Help.State?
         var menu: Menu.State = .init()
         var settings: Settings.State?
         var showGlassBoards: [UInt32] = []
-        var showHelp: Bool = false
-        var showSettings: Bool = false
+        var showHelpSignal: Signal<Bool>?
+        var showSettingsSignal: Signal<Bool>?
         var drawingTool: DrawingTool = .none
         var color: CGColor = .init(red: 1, green: 0, blue: 0, alpha: 1)
         
@@ -77,7 +77,7 @@ public struct AppRoot: Reducer {
                 }
                 
             case .appRootDelegate(.delegate(.start)):
-                state.fetchScreensSignal.fire()
+                state.fetchScreensSignal = .init()
                 return .run { send in
                     await send(.menu(.activateHotKey))
                 }
@@ -190,7 +190,7 @@ public struct AppRoot: Reducer {
                 
             case .help(.delegate(.dismiss)):
                 state.help = nil
-                state.showHelp = false
+                state.showHelpSignal = .init(false)
                 return .none
                 
             case .help:
@@ -198,12 +198,12 @@ public struct AppRoot: Reducer {
                 
             case .menu(.delegate(.openHelp)):
                 state.help = .init()
-                state.showHelp = true
+                state.showHelpSignal = .init(true)
                 return .none
                 
             case .menu(.delegate(.openSettings)):
                 state.settings = .init()
-                state.showSettings = true
+                state.showSettingsSignal = .init(true)
                 return .none
                 
             case let .menu(.delegate(.selectDrawingTool(drawingTool))):
@@ -233,7 +233,7 @@ public struct AppRoot: Reducer {
                 
             case .settings(.delegate(.dismiss)):
                 state.settings = nil
-                state.showSettings = false
+                state.showSettingsSignal = .init(false)
                 return .none
                 
             case .settings:

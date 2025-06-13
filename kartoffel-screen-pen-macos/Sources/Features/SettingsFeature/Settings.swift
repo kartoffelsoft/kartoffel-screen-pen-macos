@@ -9,6 +9,8 @@ public struct Settings: Reducer {
     
     public enum Action {
         
+        case dismiss
+        
         case delegate(DelegateAction)
         
         public enum DelegateAction: Equatable {
@@ -23,6 +25,11 @@ public struct Settings: Reducer {
     public var body: some Reducer<State, Action> {
         Reduce { state, action in
             switch action {
+            case .dismiss:
+                return .run { send in
+                    await send(.delegate(.dismiss))
+                }
+                
             case .delegate:
                 return .none
             }

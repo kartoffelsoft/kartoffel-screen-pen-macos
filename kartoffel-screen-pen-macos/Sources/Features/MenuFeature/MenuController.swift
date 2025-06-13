@@ -106,7 +106,7 @@ public class MenuController: NSObject {
     
     private func setupBindings() {
         viewStore.publisher.openMenuSignal.sink { [weak self] signal in
-            guard signal.isValid else { return }
+            guard let _ = signal else { return }
             guard let self = self else { return }
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {

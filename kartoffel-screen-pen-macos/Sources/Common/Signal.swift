@@ -1,17 +1,22 @@
+import Foundation
 
-public struct Signal: Equatable {
+public struct Signal<T>: Equatable {
 
-    private var count: UInt8
+    public let value: T?
     
-    public init(count: UInt8 = 0) {
-        self.count = count
+    private let token: UUID
+    
+    public init() {
+        self.token = UUID()
+        self.value = nil
     }
     
-    public mutating func fire() {
-        count = (count == UInt8.max) ? 1 : count + 1
+    public init(_ value: T) {
+        self.token = UUID()
+        self.value = value
     }
     
-    public var isValid: Bool {
-        return self.count != 0
+    public static func == (lhs: Signal<T>, rhs: Signal<T>) -> Bool {
+        lhs.token == rhs.token
     }
 }

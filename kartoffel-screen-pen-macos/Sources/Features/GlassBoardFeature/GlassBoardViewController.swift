@@ -67,13 +67,14 @@ public class GlassBoardViewController: NSViewController {
         }
         .store(in: &self.cancellables)
         
-        viewStore.publisher.command.sink { [weak self] command in
+        viewStore.publisher.commandSignal.sink { [weak self] commandSignal in
+            guard let command = commandSignal?.value else { return }
             guard let self = self else { return }
             guard let canvas = self.canvas else { return }
             
-            if case .none = command.data { return }
+            if case .none = command { return }
             
-            if case .clear = command.data {
+            if case .clear = command {
                 renderer.beginDraw(
                     onTexture: canvas,
                     loadAction: MTLLoadAction.clear,
@@ -86,7 +87,7 @@ public class GlassBoardViewController: NSViewController {
                 return
             }
             
-            if case .refresh = command.data {
+            if case .refresh = command {
                 renderer.beginDraw(
                     onTexture: canvas,
                     loadAction: MTLLoadAction.clear,
@@ -124,7 +125,7 @@ public class GlassBoardViewController: NSViewController {
                 return
             }
             
-            if case .draw = command.data {
+            if case .draw = command {
                 guard let drawing = viewStore.drawings.last else { return }
 
                 let path = Array(drawing.path.suffix(9))
