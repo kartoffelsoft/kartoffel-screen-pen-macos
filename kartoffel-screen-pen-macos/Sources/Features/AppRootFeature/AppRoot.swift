@@ -13,6 +13,7 @@ public struct AppRoot: Reducer {
     public struct State: Equatable {
 
         var appRootDelegate: AppRootDelegate.State = .init()
+        var cursorLocation: CGPoint?
         var eventTap: EventTap.State = .init()
         var fetchScreensSignal: Signal<Void>?
         var glassBoards: IdentifiedArrayOf<GlassBoard.State> = []
@@ -180,6 +181,10 @@ public struct AppRoot: Reducer {
                         await send(.glassBoards(id: id, action: .endDraw(location)))
                     }
                 }
+                return .none
+                
+            case let .eventTap(.delegate(.mouseMoved(location))):
+                state.cursorLocation = location
                 return .none
                 
             case .eventTap:

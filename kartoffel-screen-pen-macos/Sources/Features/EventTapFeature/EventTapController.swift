@@ -19,6 +19,7 @@ public class EventTapController {
         mask |= (1 << CGEventType.leftMouseDown.rawValue)
         mask |= (1 << CGEventType.leftMouseDragged.rawValue)
         mask |= (1 << CGEventType.leftMouseUp.rawValue)
+        mask |= (1 << CGEventType.mouseMoved.rawValue)
         mask |= (1 << CGEventType.rightMouseDown.rawValue)
         mask |= (1 << CGEventType.rightMouseDragged.rawValue)
         mask |= (1 << CGEventType.rightMouseUp.rawValue)
@@ -106,6 +107,10 @@ public class EventTapController {
             weakSelf.viewStore.send(.delegate(.leftMouseUp(event.location)))
             return nil
 
+        case .mouseMoved:
+            weakSelf.viewStore.send(.delegate(.mouseMoved(event.location)))
+            return nil
+            
         case .keyUp: fallthrough
         case .rightMouseDown: fallthrough
         case .rightMouseDragged: fallthrough

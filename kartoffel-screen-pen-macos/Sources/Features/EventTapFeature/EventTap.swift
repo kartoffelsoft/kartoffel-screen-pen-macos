@@ -25,6 +25,7 @@ public struct EventTap: Reducer {
             case leftMouseDown(CGPoint)
             case leftMouseDragged(CGPoint)
             case leftMouseUp(CGPoint)
+            case mouseMoved(CGPoint)
         }
     }
 
