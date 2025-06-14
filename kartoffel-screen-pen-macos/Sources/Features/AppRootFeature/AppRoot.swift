@@ -200,6 +200,11 @@ public struct AppRoot: Reducer {
                 state.help = .init()
                 state.showHelpSignal = .init(true)
                 return .none
+            
+            case .menu(.delegate(.openPermission)):
+                return .run { send in
+                    await send(.appRootDelegate(.openPermission))
+                }
                 
             case .menu(.delegate(.openSettings)):
                 state.settings = .init()

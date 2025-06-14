@@ -12,6 +12,7 @@ public struct AppRootDelegate: Reducer {
     public enum Action {
         
         case didFinishLaunching(NSDictionary)
+        case openPermission
         
         case delegate(DelegateAction)
         
@@ -28,11 +29,14 @@ public struct AppRootDelegate: Reducer {
             switch action {
             case let .didFinishLaunching(axTrustedCheckOptions):
                 state.axTrustedCheckOptions = axTrustedCheckOptions
-                AXIsProcessTrustedWithOptions(axTrustedCheckOptions)
-                
                 return .run { send in
+                    await send(.openPermission)
                     await send(.delegate(.start))
                 }
+                
+            case .openPermission:
+                AXIsProcessTrustedWithOptions(state.axTrustedCheckOptions)
+                return .none
                 
             case .delegate:
                 return .none

@@ -1,4 +1,5 @@
 import AppKit
+import ApplicationServices
 import ColorPickerFeature
 import Combine
 import ComposableArchitecture
@@ -16,6 +17,8 @@ public class MenuController: NSObject {
     private let hotKeyController: HotKeyController
     private let statusBarItem = NSStatusBar.system.statusItem(withLength: 20)
 
+    private let mainMenu = NSMenu()
+    
     public init(store: StoreOf<Menu>) {
         self.store = store
         self.viewStore = ViewStore(store, observe: { $0 })
@@ -37,65 +40,7 @@ public class MenuController: NSObject {
     }
     
     private func setupMenu() {
-        let mainMenu = NSMenu()
         mainMenu.delegate = self
-
-        let pen = NSMenuItem(
-            title: "Pen",
-            action: #selector(handlePenClick),
-            keyEquivalent: "p"
-        )
-        pen.target = self
-        mainMenu.addItem(pen)
-
-        let laserPointer = NSMenuItem(
-            title: "Laser Pointer",
-            action: #selector(handleLaserPointerClick),
-            keyEquivalent: "l"
-        )
-        laserPointer.target = self
-        mainMenu.addItem(laserPointer)
-        
-        let eraser = NSMenuItem(
-            title: "Eraser",
-            action: #selector(handleEraserClick),
-            keyEquivalent: "e"
-        )
-        eraser.target = self
-        mainMenu.addItem(eraser)
-        
-        mainMenu.addItem(NSMenuItem.separator())
-        
-        let colorPicker = NSMenuItem()
-        colorPicker.view = colorPickerView
-        mainMenu.addItem(colorPicker)
-
-        mainMenu.addItem(NSMenuItem.separator())
-        
-        let help = NSMenuItem(
-            title: "Keyboard Shortcuts Help",
-            action: #selector(handleHelpClick),
-            keyEquivalent: ""
-        )
-        help.target = self
-        mainMenu.addItem(help)
-        
-        let settings = NSMenuItem(
-            title: "Settings...",
-            action: #selector(handleSettingsClick),
-            keyEquivalent: ""
-        )
-        settings.target = self
-        mainMenu.addItem(settings)
-        
-        mainMenu.addItem(NSMenuItem.separator())
-        
-        let quit = NSMenuItem(
-            title: "Quit ScreenPen",
-            action: #selector(NSApp.terminate(_:)),
-            keyEquivalent: "q"
-        )
-        mainMenu.addItem(quit)
 
         statusBarItem.menu = mainMenu
         statusBarItem.menu?.delegate = self
@@ -104,7 +49,7 @@ public class MenuController: NSObject {
         statusBarItem.button?.image?.isTemplate = true
     }
     
-    private func setupBindings() {
+    private func setupBindings() {        
         viewStore.publisher.openMenuSignal.sink { [weak self] signal in
             guard let _ = signal else { return }
             guard let self = self else { return }
@@ -115,7 +60,79 @@ public class MenuController: NSObject {
         }
         .store(in: &self.cancellables)
     }
+    
+    private func buildMainMenu() {
+        mainMenu.removeAllItems()
+        
+        if AXIsProcessTrusted() {
+            let pen = NSMenuItem(
+                title: "Pen",
+                action: #selector(handlePenClick),
+                keyEquivalent: "p"
+            )
+            pen.target = self
+            mainMenu.addItem(pen)
 
+            let laserPointer = NSMenuItem(
+                title: "Laser Pointer",
+                action: #selector(handleLaserPointerClick),
+                keyEquivalent: "l"
+            )
+            laserPointer.target = self
+            mainMenu.addItem(laserPointer)
+            
+            let eraser = NSMenuItem(
+                title: "Eraser",
+                action: #selector(handleEraserClick),
+                keyEquivalent: "e"
+            )
+            eraser.target = self
+            mainMenu.addItem(eraser)
+            
+            mainMenu.addItem(NSMenuItem.separator())
+            
+            let colorPicker = NSMenuItem()
+            colorPicker.view = colorPickerView
+            mainMenu.addItem(colorPicker)
+
+            mainMenu.addItem(NSMenuItem.separator())
+            
+            let help = NSMenuItem(
+                title: "Keyboard Shortcuts Help",
+                action: #selector(handleHelpClick),
+                keyEquivalent: ""
+            )
+            help.target = self
+            mainMenu.addItem(help)
+            
+            let settings = NSMenuItem(
+                title: "Settings...",
+                action: #selector(handleSettingsClick),
+                keyEquivalent: ""
+            )
+            settings.target = self
+            mainMenu.addItem(settings)
+            
+        } else {
+            let permission = NSMenuItem(
+                title: "⚠️ Allow Access in Settings...",
+                action: #selector(handlePermissionClick),
+                keyEquivalent: ""
+            )
+            permission.target = self
+            mainMenu.addItem(permission)
+        }
+
+        mainMenu.addItem(NSMenuItem.separator())
+        
+        let quit = NSMenuItem(
+            title: "Quit ScreenPen",
+            action: #selector(NSApp.terminate(_:)),
+            keyEquivalent: "q"
+        )
+        mainMenu.addItem(quit)
+    }
+    
     @objc private func handlePenClick(_ sender: NSMenuItem) {
         viewStore.send(.delegate(.selectDrawingTool(.pen(color: .clear))))
     }
@@ -135,12 +152,18 @@ public class MenuController: NSObject {
     @objc private func handleSettingsClick(_ sender: NSMenuItem) {
         viewStore.send(.delegate(.openSettings))
     }
+    
+    @objc private func handlePermissionClick(_ sender: NSMenuItem) {
+        viewStore.send(.delegate(.openPermission))
+    }
 }
 
 extension MenuController: NSMenuDelegate {
     
     public func menuWillOpen(_ menu: NSMenu) {
         viewStore.send(.deactivateHotKey)
+        
+        buildMainMenu()
         
         let keyDown = CGEvent(keyboardEventSource: nil, virtualKey: 0x7D, keyDown: true)
         let keyUp = CGEvent(keyboardEventSource: nil, virtualKey: 0x7D, keyDown: false)

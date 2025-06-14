@@ -10,7 +10,7 @@ public struct Menu: Reducer {
         var colorPicker: ColorPicker.State = .init()
         var hotKey: HotKey.State = .init()
         var openMenuSignal: Signal<Void>?
-        
+
         let hotKeyEntries: [HotKeyEntry] = [
             .init(
                 id: MenuKey.openMenu.rawValue,
@@ -35,6 +35,7 @@ public struct Menu: Reducer {
         public enum DelegateAction: Equatable {
 
             case openHelp
+            case openPermission
             case openSettings
             case selectDrawingTool(DrawingTool)
         }
