@@ -85,45 +85,45 @@ public struct AppRoot: Reducer {
             case .appRootDelegate:
                 return .none
                 
-            case let .eventTap(.delegate(.commandKeyDownWith(keyCode))):
-                switch keyCode {
-                case 18:
+            case let .eventTap(.delegate(.commandKeyDownWith(key))):
+                switch key {
+                case "1":
                     return .run { send in
                         await send(.menu(.colorPicker(.selectButton(1))))
                     }
-                case 19:
+                case "2":
                     return .run { send in
                         await send(.menu(.colorPicker(.selectButton(2))))
                     }
-                case 20:
+                case "3":
                     return .run { send in
                         await send(.menu(.colorPicker(.selectButton(3))))
                     }
-                case 21:
+                case "4":
                     return .run { send in
                         await send(.menu(.colorPicker(.selectButton(4))))
                     }
-                case 23:
+                case "5":
                     return .run { send in
                         await send(.menu(.colorPicker(.selectButton(5))))
                     }
-                case 22:
+                case "6":
                     return .run { send in
                         await send(.menu(.colorPicker(.selectButton(6))))
                     }
-                case 26:
+                case "7":
                     return .run { send in
                         await send(.menu(.colorPicker(.selectButton(7))))
                     }
-                case 35:
+                case "p":
                     return .run { send in
                         await send(.menu(.delegate(.selectDrawingTool(.pen(color: .clear)))))
                     }
-                case 37:
+                case "l":
                     return .run { send in
                         await send(.menu(.delegate(.selectDrawingTool(.laserPointer(color: .clear)))))
                     }
-                case 6:
+                case "z":
                     guard case .pen = state.drawingTool else { return .none }
                     let targetId = state.glassBoards
                         .compactMap { board -> (id: UInt32, date: Date)? in
@@ -137,7 +137,7 @@ public struct AppRoot: Reducer {
                     return .run { send in
                         await send(.glassBoards(id: targetId, action: .eraseLast))
                     }
-                case 45:
+                case "n":
                     guard case .pen = state.drawingTool else { return .none }
                     return .run { [boardIds = state.glassBoards.map{$0.id}] send in
                         for id in boardIds {
