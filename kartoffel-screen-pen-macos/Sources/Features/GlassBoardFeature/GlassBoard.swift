@@ -25,7 +25,7 @@ public struct GlassBoard: Reducer {
         case beginDraw(CGPoint)
         case clear
         case continueDraw(CGPoint)
-        case cursorLocation(CGPoint)
+        case cursorLocation(CGPoint?)
         case dismiss
         case eraseLast
         case endDraw(CGPoint)
@@ -68,12 +68,18 @@ public struct GlassBoard: Reducer {
                 state.commandSignal = .init(.draw)
                 return .none
             
-            case let .cursorLocation(location):
-                guard state.frame.contains(location) else {
+            case let .cursorLocation(point):
+                guard let point = point else {
+                    state.cursorLocation = point
+                    state.commandSignal = .init(.refresh)
+                    return .none
+                }
+                
+                guard state.frame.contains(point) else {
                     state.cursorLocation = nil
                     return .none
                 }
-                state.cursorLocation = location
+                state.cursorLocation = point
                 state.commandSignal = .init(.refresh)
                 return .none
                 

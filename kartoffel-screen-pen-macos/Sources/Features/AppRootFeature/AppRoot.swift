@@ -155,6 +155,7 @@ public struct AppRoot: Reducer {
                     await send(.eventTap(.deactivate))
                     for id in boardIds {
                         await send(.glassBoards(id: id, action: .clear))
+                        await send(.glassBoards(id: id, action: .cursorLocation(nil)))
                         await send(.glassBoards(id: id, action: .selectDrawingTool(.none)))
                     }
                 }
