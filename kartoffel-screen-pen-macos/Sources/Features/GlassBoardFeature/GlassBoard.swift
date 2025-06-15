@@ -9,7 +9,7 @@ public struct GlassBoard: Reducer {
         public let id: UInt32
         var cursorLocation: CGPoint?
         public var frame: NSRect
-        public var drawingTool: DrawingTool = .none
+        var drawingTool: DrawingTool = .none
         public var drawings: [DrawingData] = []
         
         var commandSignal: Signal<DrawingCommand>?
@@ -52,6 +52,8 @@ public struct GlassBoard: Reducer {
                 guard let lastIndex = state.drawings.indices.last else { return .none }
                 state.drawings[lastIndex].drawingTool = state.drawingTool
                 state.drawings[lastIndex].add(point: point)
+                state.cursorLocation = point
+                state.commandSignal = .init(.refresh)
                 return .none
                 
             case .clear:
@@ -62,6 +64,7 @@ public struct GlassBoard: Reducer {
             case let .continueDraw(point):
                 guard let lastIndex = state.drawings.indices.last else { return .none }
                 state.drawings[lastIndex].add(point: point)
+                state.cursorLocation = point
                 state.commandSignal = .init(.draw)
                 return .none
             
@@ -71,6 +74,7 @@ public struct GlassBoard: Reducer {
                     return .none
                 }
                 state.cursorLocation = location
+                state.commandSignal = .init(.refresh)
                 return .none
                 
             case .dismiss:
@@ -80,13 +84,14 @@ public struct GlassBoard: Reducer {
                 
             case .eraseLast:
                 _ = state.drawings.popLast()
-                state.commandSignal = .init(.refresh)
+                state.commandSignal = .init(.redraw)
                 return .none
                 
             case let .endDraw(point):
                 guard let lastIndex = state.drawings.indices.last else { return .none}
                 state.drawings[lastIndex].add(point: point)
                 state.drawings[lastIndex].completedAt = Date()
+                state.cursorLocation = point
                 state.commandSignal = .init(.draw)
                 
                 if case .laserPointer = state.drawingTool {

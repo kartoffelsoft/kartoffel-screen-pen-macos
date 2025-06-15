@@ -127,6 +127,11 @@ public class GlassBoardViewController: NSViewController {
             
             if case .none = command { return }
             
+            if case .refresh = command {
+                self.mtkView.needsDisplay = true
+                return
+            }
+            
             if case .clear = command {
                 renderer.beginDraw(
                     onTexture: canvas,
@@ -140,7 +145,7 @@ public class GlassBoardViewController: NSViewController {
                 return
             }
             
-            if case .refresh = command {
+            if case .redraw = command {
                 renderer.beginDraw(
                     onTexture: canvas,
                     loadAction: MTLLoadAction.clear,
@@ -247,12 +252,6 @@ public class GlassBoardViewController: NSViewController {
                 renderer.endDraw()
                 self.mtkView.needsDisplay = true
             }
-        }
-        .store(in: &self.cancellables)
-        
-        viewStore.publisher.cursorLocation.sink { [weak self] location in
-            guard let self = self else { return }
-            self.mtkView.needsDisplay = true
         }
         .store(in: &self.cancellables)
     }

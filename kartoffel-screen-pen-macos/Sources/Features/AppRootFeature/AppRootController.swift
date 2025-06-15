@@ -51,7 +51,7 @@ public class AppRootController {
     }
     
     @MainActor
-    private func setupBindings() {        
+    private func setupBindings() {
         viewStore.publisher.fetchScreensSignal.sink { [weak self] signal in
             guard let _ = signal else { return }
             guard let self = self else { return }
