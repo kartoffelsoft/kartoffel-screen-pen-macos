@@ -46,6 +46,7 @@ let package = Package(
         .target(
             name: "ColorPickerFeature",
             dependencies: [
+                "Common",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
             ],
             path: "./Sources/Features/ColorPickerFeature"
@@ -70,6 +71,7 @@ let package = Package(
         .target(
             name: "HelpFeature",
             dependencies: [
+                "Common",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
             ],
             path: "./Sources/Features/HelpFeature"

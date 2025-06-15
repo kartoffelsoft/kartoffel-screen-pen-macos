@@ -1,5 +1,6 @@
 import Cocoa
 import Combine
+import Common
 import ComposableArchitecture
 import MTLRenderer
 import StyleGuide
@@ -93,9 +94,13 @@ public class GlassBoardViewController: NSViewController {
                     .init(cgColor: color) ?? .red
                 )
             case let .laserPointer(color):
-                cursorImage = NSImage.theme.laserPointerCursor.withTintColor(
-                    .init(cgColor: color) ?? .red
-                )
+                if color == CGColor.red {
+                    cursorImage = NSImage.theme.laserPointerCursor
+                } else {
+                    cursorImage = NSImage.theme.laserPointerCursor.withTintColor(
+                        .init(cgColor: color) ?? .red
+                    )
+                }
             case .eraser:
                 cursorImage = NSImage.theme.laserPointerCursor
             case .none:

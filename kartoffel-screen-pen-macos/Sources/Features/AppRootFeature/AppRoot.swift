@@ -13,7 +13,7 @@ public struct AppRoot: Reducer {
     public struct State: Equatable {
 
         var appRootDelegate: AppRootDelegate.State = .init()
-        var color: CGColor = .init(red: 1, green: 0, blue: 0, alpha: 1)
+        var color: CGColor = .red
         var drawingTool: DrawingTool = .none
         var eventTap: EventTap.State = .init()
         var fetchScreensSignal: Signal<Void>?

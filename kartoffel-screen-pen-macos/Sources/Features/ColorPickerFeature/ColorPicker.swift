@@ -1,3 +1,4 @@
+import Common
 import ComposableArchitecture
 import CoreGraphics
 
@@ -6,13 +7,13 @@ public struct ColorPicker: Reducer {
     public struct State: Equatable {
         
         var colorButtons: IdentifiedArrayOf<ColorButtonData> = [
-            .init(id: 1, color: .init(red: 255/255, green:   0/255, blue:   0/255, alpha: 1)),
-            .init(id: 2, color: .init(red: 255/255, green: 165/255, blue:   0/255, alpha: 1)),
-            .init(id: 3, color: .init(red: 255/255, green: 255/255, blue:   0/255, alpha: 1)),
-            .init(id: 4, color: .init(red:   0/255, green: 255/255, blue:   0/255, alpha: 1)),
-            .init(id: 5, color: .init(red:   0/255, green: 255/255, blue: 255/255, alpha: 1)),
-            .init(id: 6, color: .init(red:   0/255, green:   0/255, blue: 255/255, alpha: 1)),
-            .init(id: 7, color: .init(red: 128/255, green:   0/255, blue: 128/255, alpha: 1)),
+            .init(id: 1, color: .red),
+            .init(id: 2, color: .orange),
+            .init(id: 3, color: .yellow),
+            .init(id: 4, color: .green),
+            .init(id: 5, color: .cyan),
+            .init(id: 6, color: .blue),
+            .init(id: 7, color: .purple),
         ]
         var selectedButtonId: Int = 1
         
