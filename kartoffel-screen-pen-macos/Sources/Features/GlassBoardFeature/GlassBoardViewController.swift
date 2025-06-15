@@ -88,8 +88,10 @@ public class GlassBoardViewController: NSViewController {
             let cursorImage: NSImage?
             
             switch tool {
-            case .pen:
-                cursorImage = NSImage.theme.penCursor
+            case let .pen(color):
+                cursorImage = NSImage.theme.penCursor.withTintColor(
+                    .init(cgColor: color) ?? .red
+                )
             case let .laserPointer(color):
                 cursorImage = NSImage.theme.laserPointerCursor.withTintColor(
                     .init(cgColor: color) ?? .red
