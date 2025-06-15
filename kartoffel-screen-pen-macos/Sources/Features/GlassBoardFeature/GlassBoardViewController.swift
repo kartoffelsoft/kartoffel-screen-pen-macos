@@ -12,6 +12,7 @@ public class GlassBoardViewController: NSViewController {
     
     private let renderer: MTLRenderer
     private var canvas: MTLTexture?
+    private var cursor: MTLTexture?
     
     private var mtkView: MTKView {
         return self.view as! MTKView
@@ -36,6 +37,7 @@ public class GlassBoardViewController: NSViewController {
         mtkView.enableSetNeedsDisplay = true
 
         setupBindings()
+        setupCursor()
     }
 
     public override func viewWillAppear() {
@@ -59,6 +61,57 @@ public class GlassBoardViewController: NSViewController {
     }
 
     private func setupBindings() {
+        viewStore.publisher.drawingTool.sink { [weak self] tool in
+            guard let self = self else { return }
+            guard let cursor = cursor else { return }
+            
+            let width = 64
+            let height = 64
+            let bytesPerPixel = 4
+            let bytesPerRow = width * bytesPerPixel
+            let imageByteCount = height * bytesPerRow
+            
+            var rawData = [UInt8](repeating: 0, count: imageByteCount)
+            
+            guard let colorSpace = CGColorSpace(name: CGColorSpace.sRGB),
+                  let cgContext = CGContext(
+                      data: &rawData,
+                      width: width,
+                      height: height,
+                      bitsPerComponent: 8,
+                      bytesPerRow: bytesPerRow,
+                      space: colorSpace,
+                      bitmapInfo: CGImageAlphaInfo.premultipliedFirst.rawValue |
+                                  CGBitmapInfo.byteOrder32Little.rawValue
+                  ) else { return }
+            
+            let cursorImage: NSImage?
+            
+            switch tool {
+            case .pen:
+                cursorImage = NSImage.theme.penCursor
+            case .laserPointer:
+                cursorImage = NSImage.theme.laserPointerCursor
+            case .eraser:
+                cursorImage = NSImage.theme.laserPointerCursor
+            case .none:
+                cursorImage = nil
+            }
+
+            if let cursorImage = cursorImage {
+                NSGraphicsContext.saveGraphicsState()
+                NSGraphicsContext.current = NSGraphicsContext(cgContext: cgContext, flipped: false)
+                cursorImage.draw(in: .init(x: 0, y: 0, width: width, height: height))
+                NSGraphicsContext.restoreGraphicsState()
+            }
+
+            let region = MTLRegionMake2D(0, 0, width, height)
+            cursor.replace(region: region, mipmapLevel: 0, withBytes: &rawData, bytesPerRow: bytesPerRow)
+            
+            self.mtkView.needsDisplay = true
+        }
+        .store(in: &self.cancellables)
+        
         viewStore.publisher.frame.sink { [weak self] frame in
             guard let self = self else { return }
             self.view.setFrameOrigin(.zero)
@@ -196,6 +249,12 @@ public class GlassBoardViewController: NSViewController {
             }
         }
         .store(in: &self.cancellables)
+        
+        viewStore.publisher.cursorLocation.sink { [weak self] location in
+            guard let self = self else { return }
+            self.mtkView.needsDisplay = true
+        }
+        .store(in: &self.cancellables)
     }
     
     private func setupCanvas(with size: CGSize) {
@@ -207,6 +266,17 @@ public class GlassBoardViewController: NSViewController {
         )
         desc.usage = [.renderTarget, .shaderRead, .shaderWrite]
         canvas = mtkView.device?.makeTexture(descriptor: desc)
+    }
+    
+    private func setupCursor() {
+        let desc = MTLTextureDescriptor.texture2DDescriptor(
+            pixelFormat: .bgra8Unorm,
+            width: Int(64),
+            height: Int(64),
+            mipmapped: false
+        )
+        desc.usage = [.renderTarget, .shaderRead, .shaderWrite]
+        cursor = mtkView.device?.makeTexture(descriptor: desc)
     }
 }
 
@@ -242,6 +312,30 @@ extension GlassBoardViewController: MTKViewDelegate {
             color: .white
         )
         
+        if let cursor = cursor,
+           let cursorLocation = viewStore.cursorLocation {
+            let x = CGFloat(cursorLocation.x - 32)
+            let y = CGFloat(cursorLocation.y - 32)
+            let width = 64.0
+            let height = 64.0
+            
+            self.renderer.pushClipRect(.init(
+                x: x,
+                y: y,
+                width: width,
+                height: height,
+            ))
+            
+            self.renderer.addTexture(
+                with: cursor,
+                p1: .init(x: x, y: y),
+                p2: .init(x: x + width, y: y + height),
+                color: .black
+            )
+            
+            self.renderer.popClipRect()
+        }
+
         self.renderer.popClipRect()
         
         renderer.endDraw()

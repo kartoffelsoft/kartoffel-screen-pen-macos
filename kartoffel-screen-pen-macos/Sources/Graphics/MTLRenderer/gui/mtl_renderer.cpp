@@ -258,7 +258,7 @@ void mtl_renderer_t::setup_render_pipeline()
     MTL::Function *fragment_func = library->newFunction(NS::String::string("fragment_main", NS::UTF8StringEncoding));
     if(vertex_func == nullptr || fragment_func == nullptr)
     {
-        std::cout << "Error: failed to find Metal shader functions in library: " << error << std::endl;
+        std::cout << "Error: Failed to find Metal shader functions in library: " << error << std::endl;
         if(vertex_func) vertex_func->release();
         if(fragment_func) fragment_func->release();
         library->release();
@@ -299,7 +299,7 @@ void mtl_renderer_t::setup_render_pipeline()
     _render_pipeline.reset(_device->newRenderPipelineState(pipeline_desc, &error));
     if(_render_pipeline == nullptr)
     {
-        std::cout << "Error: failed to create Metal pipeline state: " << error << std::endl;
+        std::cout << "Error: Failed to create Metal pipeline state: " << error << std::endl;
         if(vertex_desc) vertex_desc->release();
         if(pipeline_desc) pipeline_desc->release();
         vertex_func->release();

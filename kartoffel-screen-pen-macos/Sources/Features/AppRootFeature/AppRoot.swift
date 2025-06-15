@@ -13,7 +13,8 @@ public struct AppRoot: Reducer {
     public struct State: Equatable {
 
         var appRootDelegate: AppRootDelegate.State = .init()
-        var cursorLocation: CGPoint?
+        var color: CGColor = .init(red: 1, green: 0, blue: 0, alpha: 1)
+        var drawingTool: DrawingTool = .none
         var eventTap: EventTap.State = .init()
         var fetchScreensSignal: Signal<Void>?
         var glassBoards: IdentifiedArrayOf<GlassBoard.State> = []
@@ -23,9 +24,7 @@ public struct AppRoot: Reducer {
         var showGlassBoards: [UInt32] = []
         var showHelpSignal: Signal<Bool>?
         var showSettingsSignal: Signal<Bool>?
-        var drawingTool: DrawingTool = .none
-        var color: CGColor = .init(red: 1, green: 0, blue: 0, alpha: 1)
-        
+
         public init() {}
     }
     
@@ -156,6 +155,7 @@ public struct AppRoot: Reducer {
                     await send(.eventTap(.deactivate))
                     for id in boardIds {
                         await send(.glassBoards(id: id, action: .clear))
+                        await send(.glassBoards(id: id, action: .selectDrawingTool(.none)))
                     }
                 }
                 
@@ -184,8 +184,11 @@ public struct AppRoot: Reducer {
                 return .none
                 
             case let .eventTap(.delegate(.mouseMoved(location))):
-                state.cursorLocation = location
-                return .none
+                return .run { [boardIds = state.glassBoards.map{$0.id}] send in
+                    for id in boardIds {
+                        await send(.glassBoards(id: id, action: .cursorLocation(location)))
+                    }
+                }
                 
             case .eventTap:
                 return .none

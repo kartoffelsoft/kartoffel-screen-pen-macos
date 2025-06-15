@@ -7,8 +7,9 @@ public struct GlassBoard: Reducer {
     public struct State: Equatable, Identifiable {
         
         public let id: UInt32
+        var cursorLocation: CGPoint?
         public var frame: NSRect
-        public var currentDrawingTool: DrawingTool = .none
+        public var drawingTool: DrawingTool = .none
         public var drawings: [DrawingData] = []
         
         var commandSignal: Signal<DrawingCommand>?
@@ -24,6 +25,7 @@ public struct GlassBoard: Reducer {
         case beginDraw(CGPoint)
         case clear
         case continueDraw(CGPoint)
+        case cursorLocation(CGPoint)
         case dismiss
         case eraseLast
         case endDraw(CGPoint)
@@ -48,7 +50,7 @@ public struct GlassBoard: Reducer {
                 state.drawings.append(.init())
 
                 guard let lastIndex = state.drawings.indices.last else { return .none }
-                state.drawings[lastIndex].drawingTool = state.currentDrawingTool
+                state.drawings[lastIndex].drawingTool = state.drawingTool
                 state.drawings[lastIndex].add(point: point)
                 return .none
                 
@@ -63,6 +65,14 @@ public struct GlassBoard: Reducer {
                 state.commandSignal = .init(.draw)
                 return .none
             
+            case let .cursorLocation(location):
+                guard state.frame.contains(location) else {
+                    state.cursorLocation = nil
+                    return .none
+                }
+                state.cursorLocation = location
+                return .none
+                
             case .dismiss:
                 return .run { send in
                     await send(.delegate(.dismiss))
@@ -79,7 +89,7 @@ public struct GlassBoard: Reducer {
                 state.drawings[lastIndex].completedAt = Date()
                 state.commandSignal = .init(.draw)
                 
-                if case .laserPointer = state.currentDrawingTool {
+                if case .laserPointer = state.drawingTool {
                     return .run { send in
                         await send(.clear)
                     }
@@ -87,9 +97,9 @@ public struct GlassBoard: Reducer {
                 return .none
                 
             case let .selectDrawingTool(tool):
-                state.currentDrawingTool = tool
+                state.drawingTool = tool
                 
-                if case .laserPointer = state.currentDrawingTool {
+                if case .laserPointer = state.drawingTool {
                     return .run { send in
                         await send(.clear)
                     }
